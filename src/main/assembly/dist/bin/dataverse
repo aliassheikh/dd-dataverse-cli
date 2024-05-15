@@ -1,10 +1,10 @@
 #!/bin/sh
 
-MODULENAME=${artifactid}
+MODULENAME="dd-dataverse-cli"
 BINPATH=$(command readlink -f $0 2> /dev/null || command grealpath $0 2> /dev/null)
 APPHOME=$(dirname  $(dirname $BINPATH))
 EXAMPLE_CONFIG_PATH=/etc/opt/dans.knaw.nl/$MODULENAME/example-config.yml
-CONFIG_PATH=$HOME/.$dataverse.yml
+CONFIG_PATH=$HOME/.dd-dataverse-cli.yml
 
 java -Ddans.default.config=$CONFIG_PATH \
      -Ddans.default.example.config=$EXAMPLE_CONFIG_PATH \
