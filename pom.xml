@@ -29,7 +29,7 @@
     <artifactId>dd-dataverse-cli</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
-    <name>Dd Dataverse Cli</name>
+    <name>DD Dataverse CLI</name>
     <url>https://github.com/DANS-KNAW/dd-dataverse-cli</url>
     <description>Command-line client for the Dataverse API</description>
     <inceptionYear>2024</inceptionYear>
