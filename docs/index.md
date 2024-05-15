@@ -1,41 +1,34 @@
 dd-dataverse-cli
-===========
+================
 
-<!-- Remove this comment and extend the descriptions below -->
+Command-line client for the Dataverse API.
 
 
 SYNOPSIS
 --------
 
-    dd-dataverse-cli { server | check }
-
+    dataverse --help
 
 DESCRIPTION
 -----------
 
-Command-line client for the Dataverse API
+Command-line client for the Dataverse API. It uses [dans-dataverse-client-lib]{:target="_blank"} to send queries to the [Dataverse API]{:target="_blank"}. It is
+currently work in progress. The target version of Dataverse is 6.0.
 
+[dans-dataverse-client-lib]: https://github.com/DANS-KNAW/dans-dataverse-client-lib
+
+[Dataverse API]: http://guides.dataverse.org/en/latest/api/index.html
 
 ARGUMENTS
 ---------
 
-        positional arguments:
-        {server,check}         available commands
-        
-        named arguments:
-        -h, --help             show this help message and exit
-        -v, --version          show the application version and exit
+See `dataverse --help` for a list of available commands.
 
-EXAMPLES
---------
-
-<!-- Add examples of invoking this module from the command line or via HTTP other interfaces -->
-    
 
 INSTALLATION AND CONFIGURATION
 ------------------------------
-Currently this project is built as an RPM package for RHEL7/CentOS7 and later. The RPM will install the binaries to
-`/opt/dans.knaw.nl/dd-dataverse-cli` and the configuration files to `/etc/opt/dans.knaw.nl/dd-dataverse-cli`. 
+Currently, this project is built as an RPM package for RHEL8 and later. The RPM will install the binaries to
+`/opt/dans.knaw.nl/dd-dataverse-cli` and the configuration files to `/etc/opt/dans.knaw.nl/dd-dataverse-cli`.
 
 For installation on systems that do no support RPM and/or systemd:
 
@@ -50,17 +43,17 @@ BUILDING FROM SOURCE
 --------------------
 Prerequisites:
 
-* Java 11 or higher
-* Maven 3.3.3 or higher
+* Java 17 or higher
+* Maven 3.6.3 or higher
 * RPM
 
 Steps:
-    
+
     git clone https://github.com/DANS-KNAW/dd-dataverse-cli.git
     cd dd-dataverse-cli 
     mvn clean install
 
-If the `rpm` executable is found at `/usr/local/bin/rpm`, the build profile that includes the RPM 
+If the `rpm` executable is found at `/usr/local/bin/rpm`, the build profile that includes the RPM
 packaging will be activated. If `rpm` is available, but at a different path, then activate it by using
 Maven's `-P` switch: `mvn -Pprm install`.
 
