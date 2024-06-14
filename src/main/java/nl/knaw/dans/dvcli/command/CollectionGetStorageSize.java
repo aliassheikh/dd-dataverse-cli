@@ -29,7 +29,7 @@ import java.io.IOException;
 public class CollectionGetStorageSize extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
-    
+
     public CollectionGetStorageSize(@NonNull DataverseClient dataverseClient) {
         super(dataverseClient);
     }

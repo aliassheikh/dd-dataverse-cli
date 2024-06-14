@@ -19,8 +19,18 @@ package nl.knaw.dans.dvcli;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.dvcli.command.CollectionAssignRole;
 import nl.knaw.dans.dvcli.command.CollectionCmd;
+import nl.knaw.dans.dvcli.command.CollectionCreateDataset;
+import nl.knaw.dans.dvcli.command.CollectionDelete;
+import nl.knaw.dans.dvcli.command.CollectionGetContents;
 import nl.knaw.dans.dvcli.command.CollectionGetStorageSize;
+import nl.knaw.dans.dvcli.command.CollectionImportDataset;
+import nl.knaw.dans.dvcli.command.CollectionIsMetadataBlocksRoot;
+import nl.knaw.dans.dvcli.command.CollectionListMetadataBlocks;
 import nl.knaw.dans.dvcli.command.CollectionListRoleAssignments;
+import nl.knaw.dans.dvcli.command.CollectionListRoles;
+import nl.knaw.dans.dvcli.command.CollectionPublish;
+import nl.knaw.dans.dvcli.command.CollectionSetMetadataBlocksRoot;
+import nl.knaw.dans.dvcli.command.CollectionView;
 import nl.knaw.dans.dvcli.config.DdDataverseCliConfig;
 import nl.knaw.dans.lib.util.AbstractCommandLineApp;
 import nl.knaw.dans.lib.util.CliVersionProvider;
@@ -46,11 +56,22 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
         log.debug("Building Dataverse client");
         var dataverseClient = config.getDataverse().build();
 
-        log.debug("Configuring command line");
         commandLine.addSubcommand(new CommandLine(new CollectionCmd())
-            .addSubcommand(new CollectionGetStorageSize(dataverseClient))
             .addSubcommand(new CollectionAssignRole(dataverseClient))
-            .addSubcommand(new CollectionListRoleAssignments(dataverseClient)));
+            .addSubcommand(new CollectionCreateDataset(dataverseClient))
+            .addSubcommand(new CollectionDelete(dataverseClient))
+            .addSubcommand(new CollectionGetContents(dataverseClient))
+            .addSubcommand(new CollectionGetStorageSize(dataverseClient))
+            .addSubcommand(new CollectionImportDataset(dataverseClient))
+            .addSubcommand(new CollectionIsMetadataBlocksRoot(dataverseClient))
+            .addSubcommand(new CollectionListMetadataBlocks(dataverseClient))
+            .addSubcommand(new CollectionListRoleAssignments(dataverseClient))
+            .addSubcommand(new CollectionListRoles(dataverseClient))
+            .addSubcommand(new CollectionPublish(dataverseClient))
+            .addSubcommand(new CollectionSetMetadataBlocksRoot(dataverseClient))
+            .addSubcommand(new CollectionView(dataverseClient))
+        );
+        log.debug("Configuring command line");
 
     }
 }

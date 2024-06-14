@@ -17,7 +17,7 @@ package nl.knaw.dans.dvcli.command;
 
 import java.util.concurrent.Callable;
 
-public abstract class AbstractSubcommandContainer implements Callable<Integer>  {
+public abstract class AbstractSubcommandContainer implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         return 0;

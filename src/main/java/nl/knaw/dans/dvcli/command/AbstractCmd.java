@@ -24,10 +24,9 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 @RequiredArgsConstructor
-public abstract class AbstractCmd implements Callable<Integer>  {
+public abstract class AbstractCmd implements Callable<Integer> {
     @NonNull
     protected final DataverseClient dataverseClient;
-
 
     @Override
     public Integer call() throws Exception {
@@ -40,6 +39,6 @@ public abstract class AbstractCmd implements Callable<Integer>  {
             return 1;
         }
     }
-    
+
     public abstract void doCall() throws IOException, DataverseException;
 }
