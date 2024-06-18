@@ -26,6 +26,5 @@ public class CollectionCmd extends AbstractSubcommandContainer {
     @Parameters(index = "0", paramLabel = "alias", description = "The alias of the dataverse collection (default: root)", defaultValue = "root")
     @Getter
     private String alias;
-    
-    
+
 }

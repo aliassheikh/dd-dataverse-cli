@@ -18,25 +18,29 @@ package nl.knaw.dans.dvcli.command;
 import lombok.NonNull;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "get-storage-size",
+@Command(name = "set-metadata-blocks-root",
          mixinStandardHelpOptions = true,
-         description = "Get the storage size of a Dataverse collection.")
-public class CollectionGetStorageSize extends AbstractCmd {
+         description = "Configure a dataverse collection to inherit its metadata blocks from its parent.")
+public class CollectionSetMetadataBlocksRoot extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionGetStorageSize(@NonNull DataverseClient dataverseClient) {
+    @CommandLine.Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
+    private Boolean isRoot;
+
+    public CollectionSetMetadataBlocksRoot(@NonNull DataverseClient dataverseClient) {
         super(dataverseClient);
     }
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).getStorageSize();
+        var r = dataverseClient.dataverse(collectionCmd.getAlias()).setMetadataBlocksRoot(isRoot);
         System.out.println(r.getEnvelopeAsString());
     }
 }

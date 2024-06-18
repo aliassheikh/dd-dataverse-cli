@@ -16,29 +16,27 @@
 package nl.knaw.dans.dvcli.command;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
-@RequiredArgsConstructor
-public abstract class AbstractCmd implements Callable<Integer> {
-    @NonNull
-    protected final DataverseClient dataverseClient;
+@Command(name = "publish",
+         mixinStandardHelpOptions = true,
+         description = "Publish a dataverse collection.")
+public class CollectionPublish extends AbstractCmd {
+    @ParentCommand
+    private CollectionCmd collectionCmd;
 
-    @Override
-    public Integer call() throws Exception {
-        try {
-            doCall();
-            return 0;
-        }
-        catch (DataverseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
+    public CollectionPublish(@NonNull DataverseClient dataverseClient) {
+        super(dataverseClient);
     }
 
-    public abstract void doCall() throws IOException, DataverseException;
+    @Override
+    public void doCall() throws IOException, DataverseException {
+        var r = dataverseClient.dataverse(collectionCmd.getAlias()).publish();
+        System.out.println(r.getEnvelopeAsString());
+    }
 }

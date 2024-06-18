@@ -18,25 +18,34 @@ package nl.knaw.dans.dvcli.command;
 import lombok.NonNull;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-@Command(name = "get-storage-size",
+@Command(name = "create-dataset",
          mixinStandardHelpOptions = true,
-         description = "Get the storage size of a Dataverse collection.")
-public class CollectionGetStorageSize extends AbstractCmd {
+         description = "Create a dataset in a dataverse collection.")
+public class CollectionCreateDataset extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionGetStorageSize(@NonNull DataverseClient dataverseClient) {
+    @CommandLine.Parameters(index = "0", paramLabel = "dataset", description = "A JSON string defining the dataset to create..")
+    private String dataset;
+
+    @CommandLine.Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
+    private Map<String, String> metadataKeys = new HashMap<>();
+
+    public CollectionCreateDataset(@NonNull DataverseClient dataverseClient) {
         super(dataverseClient);
     }
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).getStorageSize();
+        var r = dataverseClient.dataverse(collectionCmd.getAlias()).createDataset(dataset, metadataKeys);
         System.out.println(r.getEnvelopeAsString());
     }
 }
