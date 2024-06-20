@@ -16,28 +16,20 @@
 package nl.knaw.dans.dvcli.action;
 
 /**
- * Report the success or failure of an action.
+ * Implements a report to the console.
  *
- * @param <T> the type of the item that was processed
+ * @param <I> the type of the item that was processed
  * @param <R> the type of the result of the action
  */
-public interface Report<T, R> {
+public class ConsoleReport<I, R> implements Report<I, R> {
 
-    /**
-     * Report a successful action.
-     *
-     * @param label a label for the item that was processed
-     * @param t     the item that was processed
-     * @param r     the result of the action
-     */
-    void reportSuccess(String label, T t, R r);
+    @Override
+    public void reportSuccess(String label, I i, R r) {
+        System.err.println(label + ": OK");
+    }
 
-    /**
-     * Report a failed action.
-     *
-     * @param label a label for the item for which the action was attempted
-     * @param t     the item for which the action was attempted
-     * @param e     the exception that was thrown
-     */
-    void reportFailure(String label, T t, Exception e);
+    @Override
+    public void reportFailure(String label, I i, Exception e) {
+        System.err.println(label + ": FAILED: " + e.getMessage());
+    }
 }

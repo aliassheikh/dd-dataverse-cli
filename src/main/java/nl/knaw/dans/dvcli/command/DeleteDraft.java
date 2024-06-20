@@ -16,8 +16,9 @@
 package nl.knaw.dans.dvcli.command;
 
 import nl.knaw.dans.dvcli.action.BatchProcessor;
-import nl.knaw.dans.lib.dataverse.DataverseException;
+import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
+import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
@@ -32,11 +33,15 @@ public class DeleteDraft extends AbstractCmd {
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        BatchProcessor.<DatasetApi>builder()
-                .items(datasetCmd.getDatasets())
-                .action(d -> d.deleteDraft())
-                .delay(1000L)
-                .build()
-                .process();
+        BatchProcessor.<DatasetApi, String> builder()
+            .labeledItems(datasetCmd.getDatasets())
+            .action(d -> {
+                var r = d.deleteDraft();
+                return r.getEnvelopeAsString();
+            })
+            .report(new ConsoleReport<>())
+            .delay(1000L)
+            .build()
+            .process();
     }
 }

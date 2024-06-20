@@ -1,25 +1,75 @@
+/*
+ * Copyright (C) 2024 DANS - Data Archiving and Networked Services (info@dans.knaw.nl)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.knaw.dans.dvcli.action;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.function.Function;
 
+/**
+ * Processes a batch of labeled items by applying an action to each item. The labels are used for reporting. Typically, the label is the ID of the item. After each action, the processor waits for a
+ * delay, if specified. The processor reports the results of the actions to a report.
+ *
+ * @param <I> the type of the items
+ * @param <R> the type of action results
+ * @see Report for the interface that the report must implement
+ */
 @Builder
 @Slf4j
-public class BatchProcessor<I> {
-    private Iterable<I> items;
-    private Action action;
+public class BatchProcessor<I, R> {
+    /**
+     * The labeled items to process.
+     */
+    private final Iterable<Pair<String, I>> labeledItems;
 
-    private long delay;
+    /**
+     * The action to apply to each item.
+     */
+    private final ThrowingFunction<I, R, Exception> action;
+
+    /**
+     * The report to which the results of the actions are reported.
+     */
+    private final Report<I, R> report;
+
+    /**
+     * The delay in milliseconds between processing items. A delay of 0 or less means no delay.
+     */
+    @Builder.Default
+    private final long delay = 1000;
 
     public void process() {
+        log.info("Starting batch processing");
         int i = 0;
-        for (var item : items) {
+        for (var labeledItem : labeledItems) {
             delayIfNeeded(i);
             logStartAction(++i);
-            action.apply(item);
+            callAction(labeledItem.getFirst(), labeledItem.getSecond());
+        }
+        log.info("Finished batch processing");
+    }
+
+    private void callAction(String label, I item) {
+        try {
+            R r = action.apply(item);
+            report.reportSuccess(label, item, r);
+        }
+        catch (Exception e) {
+            report.reportFailure(label, item, e);
         }
     }
 
@@ -37,8 +87,8 @@ public class BatchProcessor<I> {
     }
 
     private void logStartAction(int i) {
-        if (items instanceof List) {
-            log.info("Processing item {} of {}", i, ((List<?>) items).size());
+        if (labeledItems instanceof List) {
+            log.info("Processing item {} of {}", i, ((List<?>) labeledItems).size());
         }
         else {
             log.info("Processing item {}", i);

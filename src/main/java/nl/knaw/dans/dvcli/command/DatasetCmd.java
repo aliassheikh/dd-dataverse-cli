@@ -15,41 +15,33 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import nl.knaw.dans.dvcli.action.Pair;
+import nl.knaw.dans.dvcli.action.SingleDatasetOrDatasetsFile;
+import nl.knaw.dans.dvcli.action.SingleIdOrIdsFile;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Command(name = "dataset",
          mixinStandardHelpOptions = true,
          description = "Manage Dataverse datasets")
 @Slf4j
 public class DatasetCmd extends AbstractSubcommandContainer {
-    @Parameters(index = "0", paramLabel = "id", description = "The id or PID of the dataset")
+    @Parameters(index = "0", paramLabel = "id", description = "The ID or PID of the dataset, or a file with a list of IDs or PIDs.")
     private String id;
 
     public DatasetCmd(DataverseClient dataverseClient) {
         super(dataverseClient);
     }
-    
-    
 
-    List<DatasetApi> getDatasets() {
-        // If id is a number convert it to an integer
-        try {
-            var databaseId = Integer.parseInt(id);
-            log.debug("ID {} is a number, assuming it is a database ID", id);
-            return List.of(dataverseClient.dataset(databaseId));
-        }
-        catch (NumberFormatException e) {
-            // Do nothing
-        }
-        log.debug("ID {} is not a number, assuming it is a PID", id);
-        return List.of(dataverseClient.dataset(id));
+    List<Pair<String, DatasetApi>> getDatasets() throws IOException {
+        return new SingleDatasetOrDatasetsFile(id, dataverseClient).getDatasets().collect(Collectors.toList());
+        
     }
-
 }
