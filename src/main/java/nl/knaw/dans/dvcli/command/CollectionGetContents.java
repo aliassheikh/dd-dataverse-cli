@@ -15,8 +15,6 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.NonNull;
-import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
@@ -30,13 +28,9 @@ public class CollectionGetContents extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionGetContents(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).getContents();
+        var r = collectionCmd.getDataverse().getContents();
         System.out.println(r.getEnvelopeAsString());
     }
 }

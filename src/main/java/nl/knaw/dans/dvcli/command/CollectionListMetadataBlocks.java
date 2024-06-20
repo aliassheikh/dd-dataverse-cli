@@ -30,13 +30,9 @@ public class CollectionListMetadataBlocks extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionListMetadataBlocks(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).listMetadataBlocks();
+        var r = collectionCmd.getDataverse().listMetadataBlocks();
         System.out.println(r.getEnvelopeAsString());
     }
 }

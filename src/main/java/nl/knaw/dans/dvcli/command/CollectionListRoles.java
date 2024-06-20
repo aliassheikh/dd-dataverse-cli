@@ -30,13 +30,9 @@ public class CollectionListRoles extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionListRoles(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).listRoles();
+        var r = collectionCmd.getDataverse().listRoles();
         System.out.println(r.getEnvelopeAsString());
     }
 }

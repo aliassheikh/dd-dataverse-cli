@@ -30,13 +30,9 @@ public class CollectionPublish extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionPublish(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).publish();
+        var r = collectionCmd.getDataverse().publish();
         System.out.println(r.getEnvelopeAsString());
     }
 }

@@ -30,13 +30,9 @@ public class CollectionDelete extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionDelete(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).delete();
+        var r = collectionCmd.getDataverse().delete();
         System.out.println(r.getEnvelopeAsString());
     }
 }

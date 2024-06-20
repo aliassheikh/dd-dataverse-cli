@@ -30,13 +30,9 @@ public class CollectionView extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionView(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).view();
+        var r = collectionCmd.getDataverse().view();
         System.out.println(r.getEnvelopeAsString());
     }
 }

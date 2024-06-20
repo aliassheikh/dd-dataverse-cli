@@ -15,8 +15,6 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.NonNull;
-import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -45,13 +43,9 @@ public class CollectionImportDataset extends AbstractCmd {
     @CommandLine.Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
     private Map<String, String> metadataKeys = new HashMap<>();
 
-    public CollectionImportDataset(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).importDataset(dataset, persistentId, autoPublish, metadataKeys);
+        var r = collectionCmd.getDataverse().importDataset(dataset, persistentId, autoPublish, metadataKeys);
         System.out.println(r.getEnvelopeAsString());
     }
 }

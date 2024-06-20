@@ -15,31 +15,28 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import nl.knaw.dans.dvcli.action.BatchProcessor;
 import nl.knaw.dans.lib.dataverse.DataverseException;
-import picocli.CommandLine;
+import nl.knaw.dans.lib.dataverse.DatasetApi;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-@Command(name = "create-dataset",
+@Command(name = "delete-draft",
          mixinStandardHelpOptions = true,
-         description = "Create a dataset in a dataverse collection.")
-public class CollectionCreateDataset extends AbstractCmd {
+         description = "Delete the draft version of a dataset.")
+public class DeleteDraft extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
-
-    @CommandLine.Parameters(index = "0", paramLabel = "dataset", description = "A JSON string defining the dataset to create..")
-    private String dataset;
-
-    @CommandLine.Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
-    private Map<String, String> metadataKeys = new HashMap<>();
+    private DatasetCmd datasetCmd;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = collectionCmd.getDataverse().createDataset(dataset, metadataKeys);
-        System.out.println(r.getEnvelopeAsString());
+        BatchProcessor.<DatasetApi>builder()
+                .items(datasetCmd.getDatasets())
+                .action(d -> d.deleteDraft())
+                .delay(1000L)
+                .build()
+                .process();
     }
 }

@@ -34,13 +34,9 @@ public class CollectionSetMetadataBlocksRoot extends AbstractCmd {
     @CommandLine.Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
     private Boolean isRoot;
 
-    public CollectionSetMetadataBlocksRoot(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).setMetadataBlocksRoot(isRoot);
+        var r = collectionCmd.getDataverse().setMetadataBlocksRoot(isRoot);
         System.out.println(r.getEnvelopeAsString());
     }
 }

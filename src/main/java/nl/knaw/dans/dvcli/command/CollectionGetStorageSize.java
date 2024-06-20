@@ -30,13 +30,9 @@ public class CollectionGetStorageSize extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    public CollectionGetStorageSize(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = dataverseClient.dataverse(collectionCmd.getAlias()).getStorageSize();
+        var r = collectionCmd.getDataverse().getStorageSize();
         System.out.println(r.getEnvelopeAsString());
     }
 }

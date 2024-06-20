@@ -25,9 +25,6 @@ import java.util.concurrent.Callable;
 
 @RequiredArgsConstructor
 public abstract class AbstractCmd implements Callable<Integer> {
-    @NonNull
-    protected final DataverseClient dataverseClient;
-
     @Override
     public Integer call() throws Exception {
         try {

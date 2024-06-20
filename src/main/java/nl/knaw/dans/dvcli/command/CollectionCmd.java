@@ -15,7 +15,9 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.Getter;
+import lombok.NonNull;
+import nl.knaw.dans.lib.dataverse.DataverseApi;
+import nl.knaw.dans.lib.dataverse.DataverseClient;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -24,7 +26,13 @@ import picocli.CommandLine.Parameters;
          description = "Manage Dataverse collections (i.e. 'dataverses')")
 public class CollectionCmd extends AbstractSubcommandContainer {
     @Parameters(index = "0", paramLabel = "alias", description = "The alias of the dataverse collection (default: root)", defaultValue = "root")
-    @Getter
     private String alias;
 
+    DataverseApi getDataverse() {
+        return dataverseClient.dataverse(alias);
+    }
+
+    public CollectionCmd(@NonNull DataverseClient dataverseClient) {
+        super(dataverseClient);
+    }
 }

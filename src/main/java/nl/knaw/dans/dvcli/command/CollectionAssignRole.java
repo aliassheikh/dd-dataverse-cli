@@ -38,15 +38,11 @@ public class CollectionAssignRole extends AbstractCmd {
     @Parameters(index = "1", paramLabel = "assignee", description = "The identifier of the user to assign the role to")
     private String assignee;
 
-    public CollectionAssignRole(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
         var assignment = new RoleAssignment();
         assignment.setAssignee(assignee);
         assignment.setRole(role);
-        dataverseClient.dataverse(collectionCmd.getAlias()).assignRole(assignment);
+        collectionCmd.getDataverse().assignRole(assignment);
     }
 }

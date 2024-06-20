@@ -15,11 +15,17 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import java.util.concurrent.Callable;
+import lombok.NonNull;
+import nl.knaw.dans.lib.dataverse.DataverseClient;
 
-public abstract class AbstractSubcommandContainer implements Callable<Integer> {
+public abstract class AbstractSubcommandContainer extends AbstractCmd {
+    protected DataverseClient dataverseClient;
+    
+    public AbstractSubcommandContainer(@NonNull DataverseClient dataverseClient) {
+        this.dataverseClient = dataverseClient;
+    }
+
     @Override
-    public Integer call() throws Exception {
-        return 0;
+    public void doCall() {
     }
 }
