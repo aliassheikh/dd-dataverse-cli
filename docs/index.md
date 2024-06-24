@@ -15,6 +15,25 @@ DESCRIPTION
 Command-line client for the Dataverse API. It uses [dans-dataverse-client-lib]{:target="_blank"} to send queries to the [Dataverse API]{:target="_blank"}. It is
 currently work in progress. The target version of Dataverse is 6.0.
 
+### Basic syntax
+
+    dataverse <object-type> [options] <target> <command> [options]
+
+* `<object-type>`: the type of object to operate on, e.g. `dataset`, `file`, `collection` (i.e. a "dataverse" or "subverse").
+* `<target>`: the target object, e.g. the DOI of a dataset. This argument can also be a file with a list of targets. The targets must be separated by
+  whitespace and/or newlines, so in general a file with one target per line will work. A dash (`-`) can be used to read targets from standard input. In the case
+  of the `collection` object type, leaving out the target will cause the command to default to the root dataverse.
+* `<command>`: the command to execute on the target object. The available commands depend on the object type; for example, for a dataset it could be
+  `publish`, `delete-draft`, etc. See the help for the specific object type for a list of available commands. If a list of targets is provided, the command
+  will be executed on each target in turn, with exactly the same arguments.
+
+### The `--parameters-file` option
+
+Some commands accept a parameters file as input. This is generally a CSV file with target IDs and command parameters. (However, see the help of the command for
+the specifics.) The `--parameters-file` option allows you to perform batch tasks on objects without being restricted to the same arguments for each object. For
+example, you could assign different roles to different users on different collections.
+
+
 [dans-dataverse-client-lib]: https://github.com/DANS-KNAW/dans-dataverse-client-lib
 
 [Dataverse API]: http://guides.dataverse.org/en/latest/api/index.html
