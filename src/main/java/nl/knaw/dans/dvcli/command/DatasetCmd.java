@@ -18,11 +18,9 @@ package nl.knaw.dans.dvcli.command;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.dvcli.action.Pair;
 import nl.knaw.dans.dvcli.action.SingleDatasetOrDatasetsFile;
-import nl.knaw.dans.dvcli.action.SingleIdOrIdsFile;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,16 +30,13 @@ import java.util.stream.Collectors;
          mixinStandardHelpOptions = true,
          description = "Manage Dataverse datasets")
 @Slf4j
-public class DatasetCmd extends AbstractSubcommandContainer {
-    @Parameters(index = "0", paramLabel = "id", description = "The ID or PID of the dataset, or a file with a list of IDs or PIDs.")
-    private String id;
-
+public class DatasetCmd extends AbstractSubcommandContainer<DatasetApi> {
     public DatasetCmd(DataverseClient dataverseClient) {
         super(dataverseClient);
     }
 
-    List<Pair<String, DatasetApi>> getDatasets() throws IOException {
-        return new SingleDatasetOrDatasetsFile(id, dataverseClient).getDatasets().collect(Collectors.toList());
-        
+    @Override
+    protected List<Pair<String, DatasetApi>> getItems() throws IOException {
+        return new SingleDatasetOrDatasetsFile(targets, dataverseClient).getDatasets().collect(Collectors.toList());
     }
 }

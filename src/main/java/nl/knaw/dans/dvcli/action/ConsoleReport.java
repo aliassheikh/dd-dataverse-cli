@@ -25,7 +25,8 @@ public class ConsoleReport<I, R> implements Report<I, R> {
 
     @Override
     public void reportSuccess(String label, I i, R r) {
-        System.err.println(label + ": OK. " + r);
+        System.err.print(label + ": OK. ");
+        System.out.println(r);
     }
 
     @Override

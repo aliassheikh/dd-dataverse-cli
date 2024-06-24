@@ -23,6 +23,8 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +35,7 @@ public class CollectionImportDataset extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    @Parameters(index = "0", paramLabel = "dataset", description = "A JSON string defining the dataset to import..")
+    @Parameters(index = "0", paramLabel = "dataset", description = "A JSON file with the dataset description.")
     private String dataset;
 
     @Option(names = { "-p", "--persistentId" }, paramLabel = "persistentId", description = "Existing persistent identifier (PID)")
@@ -49,7 +51,8 @@ public class CollectionImportDataset extends AbstractCmd {
     public void doCall() throws IOException, DataverseException {
         collectionCmd.batchProcessorBuilder()
             .action(d -> {
-                var r = d.importDataset(dataset, persistentId, autoPublish, metadataKeys);
+                var json = Files.readString(Path.of(dataset));
+                var r = d.importDataset(json, persistentId, autoPublish, metadataKeys);
                 return r.getEnvelopeAsString();
             })
             .report(new ConsoleReport<>())

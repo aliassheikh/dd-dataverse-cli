@@ -17,9 +17,8 @@
 package nl.knaw.dans.dvcli;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.knaw.dans.dvcli.command.CollectionAssignRole2;
+import nl.knaw.dans.dvcli.command.CollectionAssignRole;
 import nl.knaw.dans.dvcli.command.CollectionCmd;
-import nl.knaw.dans.dvcli.command.CollectionCmd2;
 import nl.knaw.dans.dvcli.command.CollectionCreateDataset;
 import nl.knaw.dans.dvcli.command.CollectionDelete;
 import nl.knaw.dans.dvcli.command.CollectionGetContents;
@@ -58,25 +57,23 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
     public void configureCommandLine(CommandLine commandLine, DdDataverseCliConfig config) {
         log.debug("Building Dataverse client");
         var dataverseClient = config.getDataverse().build();
-
         commandLine.addSubcommand(new CommandLine(new CollectionCmd(dataverseClient))
-            .addSubcommand(new CollectionDelete())
-            .addSubcommand(new CollectionGetContents())
-            .addSubcommand(new CollectionGetStorageSize())
-            .addSubcommand(new CollectionImportDataset())
-            .addSubcommand(new CollectionIsMetadataBlocksRoot())
-            .addSubcommand(new CollectionListMetadataBlocks())
-            .addSubcommand(new CollectionListRoleAssignments())
-            .addSubcommand(new CollectionListRoles())
-            .addSubcommand(new CollectionPublish())
-            .addSubcommand(new CollectionSetMetadataBlocksRoot())
-            .addSubcommand(new CollectionView())
-        ).addSubcommand(new CommandLine(new DatasetCmd(dataverseClient))
-            .addSubcommand(new DeleteDraft())
-        ).addSubcommand(new CommandLine(new CollectionCmd2(dataverseClient))
-            .addSubcommand(new CollectionCreateDataset())
-            .addSubcommand(new CollectionAssignRole2()));
+                .addSubcommand(new CollectionAssignRole())
+                .addSubcommand(new CollectionCreateDataset())
+                .addSubcommand(new CollectionDelete())
+                .addSubcommand(new CollectionGetContents())
+                .addSubcommand(new CollectionGetStorageSize())
+                .addSubcommand(new CollectionImportDataset())
+                .addSubcommand(new CollectionIsMetadataBlocksRoot())
+                .addSubcommand(new CollectionListMetadataBlocks())
+                .addSubcommand(new CollectionListRoleAssignments())
+                .addSubcommand(new CollectionListRoles())
+                .addSubcommand(new CollectionPublish())
+                .addSubcommand(new CollectionSetMetadataBlocksRoot())
+                .addSubcommand(new CollectionView()))
+            .addSubcommand(new CommandLine(new DatasetCmd(dataverseClient))
+                .addSubcommand(new DeleteDraft())
+            );
         log.debug("Configuring command line");
-
     }
 }

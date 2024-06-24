@@ -40,9 +40,9 @@ import java.util.List;
 @Command(name = "assign-role",
          mixinStandardHelpOptions = true,
          description = "Assign a role to a user in a Dataverse collection.")
-public class CollectionAssignRole2 extends AbstractCmd {
+public class CollectionAssignRole extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd2 collectionCmd;
+    private CollectionCmd collectionCmd;
 
     static class SingleAssignment {
         @Parameters(index = "0", paramLabel = "role", description = "The role to assign")

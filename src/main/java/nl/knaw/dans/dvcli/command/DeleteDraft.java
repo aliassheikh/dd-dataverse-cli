@@ -34,7 +34,7 @@ public class DeleteDraft extends AbstractCmd {
     @Override
     public void doCall() throws IOException, DataverseException {
         BatchProcessor.<DatasetApi, String> builder()
-            .labeledItems(datasetCmd.getDatasets())
+            .labeledItems(datasetCmd.getItems())
             .action(d -> {
                 var r = d.deleteDraft();
                 return r.getEnvelopeAsString();

@@ -33,7 +33,7 @@ import java.util.Map;
          description = "Create a dataset in a dataverse collection.")
 public class CollectionCreateDataset extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd2 collectionCmd;
+    private CollectionCmd collectionCmd;
 
     @Parameters(index = "0", paramLabel = "dataset", description = "A JSON file with the dataset description.")
     private String dataset;
