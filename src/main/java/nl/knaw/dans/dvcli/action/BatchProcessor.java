@@ -34,7 +34,7 @@ public class BatchProcessor<I, R> {
     /**
      * The labeled items to process.
      */
-    private final Iterable<Pair<String, I>> labeledItems;
+    private final List<Pair<String, I>> labeledItems;
 
     /**
      * The action to apply to each item.
@@ -57,7 +57,7 @@ public class BatchProcessor<I, R> {
         int i = 0;
         for (var labeledItem : labeledItems) {
             delayIfNeeded(i);
-            logStartAction(++i);
+            log.info("Processing item {} of {}", ++i, labeledItems.size());
             callAction(labeledItem.getFirst(), labeledItem.getSecond());
         }
         log.info("Finished batch processing");
@@ -86,12 +86,4 @@ public class BatchProcessor<I, R> {
         }
     }
 
-    private void logStartAction(int i) {
-        if (labeledItems instanceof List) {
-            log.info("Processing item {} of {}", i, ((List<?>) labeledItems).size());
-        }
-        else {
-            log.info("Processing item {}", i);
-        }
-    }
 }

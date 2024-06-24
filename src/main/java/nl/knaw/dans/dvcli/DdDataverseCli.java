@@ -17,8 +17,9 @@
 package nl.knaw.dans.dvcli;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.knaw.dans.dvcli.command.CollectionAssignRole;
+import nl.knaw.dans.dvcli.command.CollectionAssignRole2;
 import nl.knaw.dans.dvcli.command.CollectionCmd;
+import nl.knaw.dans.dvcli.command.CollectionCmd2;
 import nl.knaw.dans.dvcli.command.CollectionCreateDataset;
 import nl.knaw.dans.dvcli.command.CollectionDelete;
 import nl.knaw.dans.dvcli.command.CollectionGetContents;
@@ -59,8 +60,6 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
         var dataverseClient = config.getDataverse().build();
 
         commandLine.addSubcommand(new CommandLine(new CollectionCmd(dataverseClient))
-            .addSubcommand(new CollectionAssignRole())
-            .addSubcommand(new CollectionCreateDataset())
             .addSubcommand(new CollectionDelete())
             .addSubcommand(new CollectionGetContents())
             .addSubcommand(new CollectionGetStorageSize())
@@ -74,7 +73,9 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
             .addSubcommand(new CollectionView())
         ).addSubcommand(new CommandLine(new DatasetCmd(dataverseClient))
             .addSubcommand(new DeleteDraft())
-        );
+        ).addSubcommand(new CommandLine(new CollectionCmd2(dataverseClient))
+            .addSubcommand(new CollectionCreateDataset())
+            .addSubcommand(new CollectionAssignRole2()));
         log.debug("Configuring command line");
 
     }

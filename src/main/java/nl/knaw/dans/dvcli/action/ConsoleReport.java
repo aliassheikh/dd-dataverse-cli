@@ -25,11 +25,11 @@ public class ConsoleReport<I, R> implements Report<I, R> {
 
     @Override
     public void reportSuccess(String label, I i, R r) {
-        System.err.println(label + ": OK");
+        System.err.println(label + ": OK. " + r);
     }
 
     @Override
     public void reportFailure(String label, I i, Exception e) {
-        System.err.println(label + ": FAILED: " + e.getMessage());
+        System.err.println(label + ": FAILED: Exception type = " + e.getClass().getSimpleName() + ", message = " + e.getMessage());
     }
 }

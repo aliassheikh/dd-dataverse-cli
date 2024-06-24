@@ -15,12 +15,16 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,17 +33,24 @@ import java.util.Map;
          description = "Create a dataset in a dataverse collection.")
 public class CollectionCreateDataset extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
+    private CollectionCmd2 collectionCmd;
 
-    @CommandLine.Parameters(index = "0", paramLabel = "dataset", description = "A JSON string defining the dataset to create..")
+    @Parameters(index = "0", paramLabel = "dataset", description = "A JSON file with the dataset description.")
     private String dataset;
 
-    @CommandLine.Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
+    @Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
     private Map<String, String> metadataKeys = new HashMap<>();
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = collectionCmd.getDataverse().createDataset(dataset, metadataKeys);
-        System.out.println(r.getEnvelopeAsString());
+        collectionCmd.batchProcessorBuilder()
+            .action(d -> {
+                var json = Files.readString(Path.of(dataset));
+                var r = d.createDataset(json, metadataKeys);
+                return r.getEnvelopeAsString();
+            })
+            .report(new ConsoleReport<>())
+            .build()
+            .process();
     }
 }

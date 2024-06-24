@@ -13,20 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.action;
 
-import lombok.NonNull;
+import nl.knaw.dans.lib.dataverse.DataverseApi;
 import nl.knaw.dans.lib.dataverse.DataverseClient;
 
-public abstract class AbstractSubcommandContainer extends AbstractCmd {
-    protected DataverseClient dataverseClient;
+import java.io.IOException;
+import java.util.stream.Stream;
 
-    public AbstractSubcommandContainer(@NonNull DataverseClient dataverseClient) {
+public class SingleCollectionOrCollectionsFile {
+    private final SingleIdOrIdsFile singleIdOrIdsFile;
+    private final DataverseClient dataverseClient;
+
+    public SingleCollectionOrCollectionsFile(String singleCollectionOrCollectionsFile, DataverseClient dataverseClient) {
+        this.singleIdOrIdsFile = new SingleIdOrIdsFile(singleCollectionOrCollectionsFile, "root");
         this.dataverseClient = dataverseClient;
     }
 
-
-    @Override
-    public void doCall() {
+    public Stream<Pair<String, DataverseApi>> getCollections() throws IOException {
+        return singleIdOrIdsFile.getPids().map(alias -> new Pair<>(alias, dataverseClient.dataverse(alias)));
     }
 }

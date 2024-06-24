@@ -17,20 +17,45 @@ package nl.knaw.dans.dvcli.action;
 
 import lombok.AllArgsConstructor;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class SingleIdOrIdsFile {
-    private final String singleIdOrIdFile;
+    public static final String DEFAULT_TARGET_PLACEHOLDER = "__DEFAULT_TARGET_PLACEHOLDER__";
 
+    private final String singleIdOrIdFile;
+    private final String defaultId;
+
+    @SuppressWarnings("resource")
     public Stream<String> getPids() throws IOException {
-        var pidFile = Paths.get(singleIdOrIdFile);
-        if (Files.exists(pidFile)) {
-            return Files.readAllLines(pidFile).stream().map(String::trim);
+        if (singleIdOrIdFile.equals(DEFAULT_TARGET_PLACEHOLDER)) {
+            return Stream.of(defaultId);
         }
-        return Stream.of(singleIdOrIdFile);
+
+        Stream<String> lines = null;
+
+        if ("-".equals(singleIdOrIdFile)) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            lines = reader.lines();
+        }
+        else {
+            var pidFile = Paths.get(singleIdOrIdFile);
+            if (Files.exists(pidFile)) {
+                lines = Files.lines(pidFile)
+                    .flatMap(line -> Arrays.stream(line.trim().split("\\s+")));
+            }
+            else {
+                lines = Stream.of(singleIdOrIdFile);
+            }
+
+        }
+        // Split lines further by whitespace
+        return lines.flatMap(line -> Arrays.stream(line.trim().split("\\s+")));
     }
 }

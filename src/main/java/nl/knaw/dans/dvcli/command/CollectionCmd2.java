@@ -15,29 +15,26 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
-import nl.knaw.dans.lib.dataverse.DataverseException;
+import lombok.NonNull;
+import nl.knaw.dans.dvcli.action.Pair;
+import nl.knaw.dans.dvcli.action.SingleCollectionOrCollectionsFile;
+import nl.knaw.dans.lib.dataverse.DataverseApi;
+import nl.knaw.dans.lib.dataverse.DataverseClient;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.List;
 
-@Command(name = "list-roles",
+@Command(name = "collection2",
          mixinStandardHelpOptions = true,
-         description = "Get a list of roles defined in a dataverse collection.")
-public class CollectionListRoles extends AbstractCmd {
-    @ParentCommand
-    private CollectionCmd collectionCmd;
-
+         description = "Manage Dataverse collections (i.e. 'dataverses')")
+public class CollectionCmd2 extends AbstractSubcommandContainer2<DataverseApi> {
     @Override
-    public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
-            .action(d -> {
-                var r = d.listRoles();
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .build()
-            .process();
+    protected List<Pair<String, DataverseApi>> getItems() throws IOException {
+        return new SingleCollectionOrCollectionsFile(targets, dataverseClient).getCollections().toList();
+    }
+
+    public CollectionCmd2(@NonNull DataverseClient dataverseClient) {
+        super(dataverseClient);
     }
 }

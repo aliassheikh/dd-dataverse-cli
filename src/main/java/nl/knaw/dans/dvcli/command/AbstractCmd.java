@@ -15,9 +15,7 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import nl.knaw.dans.lib.dataverse.DataverseClient;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 
 import java.io.IOException;

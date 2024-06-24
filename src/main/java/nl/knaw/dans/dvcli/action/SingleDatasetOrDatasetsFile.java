@@ -26,7 +26,7 @@ public class SingleDatasetOrDatasetsFile {
     private final DataverseClient dataverseClient;
 
     public SingleDatasetOrDatasetsFile(String singleDatasetOrDatasetsFile, DataverseClient dataverseClient) {
-        this.singleIdOrIdsFile = new SingleIdOrIdsFile(singleDatasetOrDatasetsFile);
+        this.singleIdOrIdsFile = new SingleIdOrIdsFile(singleDatasetOrDatasetsFile, "-"); 
         this.dataverseClient = dataverseClient;
     }
 

@@ -15,29 +15,28 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
-import nl.knaw.dans.lib.dataverse.DataverseException;
+import lombok.extern.slf4j.Slf4j;
+import nl.knaw.dans.dvcli.action.Pair;
+import nl.knaw.dans.dvcli.action.SingleDatasetOrDatasetsFile;
+import nl.knaw.dans.lib.dataverse.DatasetApi;
+import nl.knaw.dans.lib.dataverse.DataverseClient;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Command(name = "list-roles",
+@Command(name = "dataset",
          mixinStandardHelpOptions = true,
-         description = "Get a list of roles defined in a dataverse collection.")
-public class CollectionListRoles extends AbstractCmd {
-    @ParentCommand
-    private CollectionCmd collectionCmd;
+         description = "Manage Dataverse datasets")
+@Slf4j
+public class DatasetCmd2 extends AbstractSubcommandContainer2<DatasetApi> {
+    public DatasetCmd2(DataverseClient dataverseClient) {
+        super(dataverseClient);
+    }
 
     @Override
-    public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
-            .action(d -> {
-                var r = d.listRoles();
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .build()
-            .process();
+    protected List<Pair<String, DatasetApi>> getItems() throws IOException {
+        return new SingleDatasetOrDatasetsFile(targets, dataverseClient).getDatasets().collect(Collectors.toList());
     }
 }

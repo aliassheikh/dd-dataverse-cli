@@ -15,9 +15,11 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
@@ -31,21 +33,27 @@ public class CollectionImportDataset extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    @CommandLine.Parameters(index = "0", paramLabel = "dataset", description = "A JSON string defining the dataset to import..")
+    @Parameters(index = "0", paramLabel = "dataset", description = "A JSON string defining the dataset to import..")
     private String dataset;
 
-    @CommandLine.Option(names = { "-p", "--persistentId" }, paramLabel = "persistentId", description = "Existing persistent identifier (PID)")
+    @Option(names = { "-p", "--persistentId" }, paramLabel = "persistentId", description = "Existing persistent identifier (PID)")
     String persistentId = "";
 
-    @CommandLine.Option(names = { "-a", "--autoPublish" }, paramLabel = "autoPublish", type = Boolean.class, description = "Immediately publish the dataset")
+    @Option(names = { "-a", "--auto-publish" }, description = "Immediately publish the dataset")
     Boolean autoPublish = false;
 
-    @CommandLine.Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
+    @Option(names = { "-m", "--mdkeys" }, paramLabel = "metadataKeys", description = "Maps the names of the metadata blocks to their 'secret' key values")
     private Map<String, String> metadataKeys = new HashMap<>();
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = collectionCmd.getDataverse().importDataset(dataset, persistentId, autoPublish, metadataKeys);
-        System.out.println(r.getEnvelopeAsString());
+        collectionCmd.batchProcessorBuilder()
+            .action(d -> {
+                var r = d.importDataset(dataset, persistentId, autoPublish, metadataKeys);
+                return r.getEnvelopeAsString();
+            })
+            .report(new ConsoleReport<>())
+            .build()
+            .process();
     }
 }

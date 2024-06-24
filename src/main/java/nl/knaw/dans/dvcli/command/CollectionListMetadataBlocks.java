@@ -15,8 +15,7 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.NonNull;
-import nl.knaw.dans.lib.dataverse.DataverseClient;
+import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
@@ -32,7 +31,13 @@ public class CollectionListMetadataBlocks extends AbstractCmd {
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        var r = collectionCmd.getDataverse().listMetadataBlocks();
-        System.out.println(r.getEnvelopeAsString());
+        collectionCmd.batchProcessorBuilder()
+            .action(d -> {
+                var r = d.listMetadataBlocks();
+                return r.getEnvelopeAsString();
+            })
+            .report(new ConsoleReport<>())
+            .build()
+            .process();
     }
 }
