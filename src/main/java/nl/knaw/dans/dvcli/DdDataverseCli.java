@@ -35,13 +35,13 @@ import nl.knaw.dans.dvcli.command.DatasetCmd;
 import nl.knaw.dans.dvcli.command.DeleteDraft;
 import nl.knaw.dans.dvcli.config.DdDataverseCliConfig;
 import nl.knaw.dans.lib.util.AbstractCommandLineApp;
-import nl.knaw.dans.lib.util.CliVersionProvider;
+import nl.knaw.dans.lib.util.PicocliVersionProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "dataverse",
          mixinStandardHelpOptions = true,
-         versionProvider = CliVersionProvider.class,
+         versionProvider = PicocliVersionProvider.class,
          description = "Command-line client for the Dataverse API")
 @Slf4j
 public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig> {
