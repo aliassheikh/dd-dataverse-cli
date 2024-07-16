@@ -13,7 +13,8 @@ DESCRIPTION
 -----------
 
 Command-line client for the Dataverse API. It uses [dans-dataverse-client-lib]{:target="_blank"} to send queries to the [Dataverse API]{:target="_blank"}. It is
-currently work in progress. The target version of Dataverse is 6.0.
+currently work in progress. The target version of Dataverse is kept in sync with the latest installed by the DANS Data Stations, for example 
+[Data Station Archaeology]{:target="_blank"}.
 
 ### Basic syntax
 
@@ -27,22 +28,42 @@ currently work in progress. The target version of Dataverse is 6.0.
   `publish`, `delete-draft`, etc. See the help for the specific object type for a list of available commands. If a list of targets is provided, the command
   will be executed on each target in turn, with exactly the same arguments.
 
-### The `--parameters-file` option
+### The `--parameters-file f` option
 
 Some commands accept a parameters file as input. This is generally a CSV file with target IDs and command parameters. (However, see the help of the command for
 the specifics.) The `--parameters-file` option allows you to perform batch tasks on objects without being restricted to the same arguments for each object. For
 example, you could assign different roles to different users on different collections.
+
+    dataverse <object-type> [options] <command> --parameters-file <file> [other options]
 
 
 [dans-dataverse-client-lib]: https://github.com/DANS-KNAW/dans-dataverse-client-lib
 
 [Dataverse API]: http://guides.dataverse.org/en/latest/api/index.html
 
+[Data Station Archaeology]: https://archaeology.datastations.nl/#dvfooter
+
 ARGUMENTS
 ---------
 
 See `dataverse --help` for a list of available commands.
 
+EXAMPLES
+--------
+
+```bash
+# Publish one dataset
+dataverse dataset doi:10.5072/dans-2xg-4y5 publish 
+
+# Publish all datasets in the file dataset-list.txt
+dataverse dataset dataset-list.txt publish 
+
+# Publish two datasets, sending the DOIs through standard input
+echo doi:10.5072/dans-2xg-4y5 doi:10.5072/dans-4zy-aab | dataverse dataset - publish
+
+# Add roles to datasets as specified in role-assignments.csv
+dataverse dataset role-assigment add --parameters-file role-assignments.csv 
+```
 
 INSTALLATION AND CONFIGURATION
 ------------------------------
