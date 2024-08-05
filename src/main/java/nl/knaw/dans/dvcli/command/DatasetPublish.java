@@ -20,23 +20,33 @@ import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.EnumSet;
 
-@Command(name = "delete-draft",
+@Command(name = "publish",
          mixinStandardHelpOptions = true,
-         description = "Delete the draft version of a dataset.")
-public class DeleteDraft extends AbstractCmd {
+         description = "Dataset publication result.")
+public class DatasetPublish extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
+
+    @Option(names={"-u", "--update-type"}, type =UpdateType.class, description ="'major' or 'minor' version update.")
+    private EnumSet<UpdateType> updateType = EnumSet.of(UpdateType.major);
+
+    @Option(names={"-a", "--assure-indexed"}, paramLabel = "assure-indexed", type = Boolean.class, description = "To make sure that indexing has already happened and it is set to 'true'.")
+    private boolean assureIsIndexed = true;
+
 
     @Override
     public void doCall() throws IOException, DataverseException {
         BatchProcessor.<DatasetApi, String> builder()
             .labeledItems(datasetCmd.getItems())
             .action(d -> {
-                var r = d.deleteDraft();
+                var r = d.publish();
                 return r.getEnvelopeAsString();
             })
             .report(new ConsoleReport<>())
@@ -44,4 +54,7 @@ public class DeleteDraft extends AbstractCmd {
             .build()
             .process();
     }
+
+    enum UpdateType {major, minor}
+
 }

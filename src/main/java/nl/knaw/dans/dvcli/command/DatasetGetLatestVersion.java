@@ -15,27 +15,30 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import lombok.NonNull;
-import nl.knaw.dans.dvcli.action.Pair;
-import nl.knaw.dans.dvcli.action.SingleCollectionOrCollectionsFile;
-import nl.knaw.dans.lib.dataverse.DataverseApi;
-import nl.knaw.dans.lib.dataverse.DataverseClient;
+import nl.knaw.dans.dvcli.action.ConsoleReport;
+import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
-import java.util.List;
 
-@Command(name = "collection",
+@Command(name = "get-latest-version",
          mixinStandardHelpOptions = true,
-         description = "Manage Dataverse collections (i.e. 'dataverses')")
-public class CollectionCmd extends AbstractSubcommandContainer<DataverseApi> {
-    public CollectionCmd(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
+         description = "A JSON object that starts at the dataset level, most fields are replicated at the dataset version level.")
+public class DatasetGetLatestVersion extends AbstractCmd {
+    @ParentCommand
+    private DatasetCmd datasetCmd;
 
     @Override
-    protected List<Pair<String, DataverseApi>> getItems() throws IOException {
-        return new SingleCollectionOrCollectionsFile(targets, dataverseClient).getCollections().toList();
+    public void doCall() throws IOException, DataverseException {
+        datasetCmd.batchProcessorBuilder()
+            .action(d -> {
+                var r = d.getLatestVersion();
+                return r.getEnvelopeAsString();
+            })
+            .report(new ConsoleReport<>())
+            .build()
+            .process();
     }
 
 }

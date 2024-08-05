@@ -32,7 +32,12 @@ import nl.knaw.dans.dvcli.command.CollectionPublish;
 import nl.knaw.dans.dvcli.command.CollectionSetMetadataBlocksRoot;
 import nl.knaw.dans.dvcli.command.CollectionView;
 import nl.knaw.dans.dvcli.command.DatasetCmd;
-import nl.knaw.dans.dvcli.command.DeleteDraft;
+import nl.knaw.dans.dvcli.command.DatasetGetFiles;
+import nl.knaw.dans.dvcli.command.DatasetDeleteDraft;
+import nl.knaw.dans.dvcli.command.DatasetGetLatestVersion;
+import nl.knaw.dans.dvcli.command.DatasetGetVersion;
+import nl.knaw.dans.dvcli.command.DatasetPublish;
+import nl.knaw.dans.dvcli.command.DatasetAssignRole;
 import nl.knaw.dans.dvcli.config.DdDataverseCliConfig;
 import nl.knaw.dans.lib.util.AbstractCommandLineApp;
 import nl.knaw.dans.lib.util.PicocliVersionProvider;
@@ -72,7 +77,12 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
                 .addSubcommand(new CollectionSetMetadataBlocksRoot())
                 .addSubcommand(new CollectionView()))
             .addSubcommand(new CommandLine(new DatasetCmd(dataverseClient))
-                .addSubcommand(new DeleteDraft())
+                .addSubcommand(new DatasetDeleteDraft())
+                .addSubcommand(new DatasetGetFiles())
+                .addSubcommand(new DatasetGetLatestVersion())
+                .addSubcommand(new DatasetGetVersion())
+                .addSubcommand(new DatasetPublish())
+                .addSubcommand(new DatasetAssignRole())
             );
         log.debug("Configuring command line");
     }

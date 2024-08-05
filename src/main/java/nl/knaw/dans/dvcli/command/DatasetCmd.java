@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.dvcli.action.Pair;
 import nl.knaw.dans.dvcli.action.SingleDatasetOrDatasetsFile;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
          description = "Manage Dataverse datasets")
 @Slf4j
 public class DatasetCmd extends AbstractSubcommandContainer<DatasetApi> {
-    public DatasetCmd(DataverseClient dataverseClient) {
+    public DatasetCmd(@NonNull DataverseClient dataverseClient) {
         super(dataverseClient);
     }
 

@@ -23,21 +23,20 @@ import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "set-metadata-blocks-root",
+@Command(name = "get-version",
          mixinStandardHelpOptions = true,
-         description = "Configure a dataverse collection to inherit its metadata blocks from its parent.")
-public class CollectionSetMetadataBlocksRoot extends AbstractCmd {
+         description = "Returns an object containing the dataset version metadata.")
+public class DatasetGetVersion extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
-
-    @Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
-    private Boolean isRoot;
+    private DatasetCmd datasetCmd;
+    @Parameters(index = "0", paramLabel = "version", description = "version to retrieve.")
+    String version;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
+        datasetCmd.batchProcessorBuilder()
             .action(d -> {
-                var r = d.setMetadataBlocksRoot(isRoot);
+                var r = d.getVersion(version);
                 return r.getEnvelopeAsString();
             })
             .report(new ConsoleReport<>())

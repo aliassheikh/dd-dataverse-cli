@@ -15,32 +15,32 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import nl.knaw.dans.dvcli.action.BatchProcessor;
 import nl.knaw.dans.dvcli.action.ConsoleReport;
+import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "set-metadata-blocks-root",
+@Command(name = "delete-draft",
          mixinStandardHelpOptions = true,
-         description = "Configure a dataverse collection to inherit its metadata blocks from its parent.")
-public class CollectionSetMetadataBlocksRoot extends AbstractCmd {
+         description = "Delete the draft version of a dataset.")
+public class DatasetDeleteDraft extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
-
-    @Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
-    private Boolean isRoot;
+    private DatasetCmd datasetCmd;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
+        BatchProcessor.<DatasetApi, String> builder()
+            .labeledItems(datasetCmd.getItems())
             .action(d -> {
-                var r = d.setMetadataBlocksRoot(isRoot);
+                var r = d.deleteDraft();
                 return r.getEnvelopeAsString();
             })
             .report(new ConsoleReport<>())
+            .delay(1000L)
             .build()
             .process();
     }
