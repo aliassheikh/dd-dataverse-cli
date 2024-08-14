@@ -19,13 +19,13 @@ import nl.knaw.dans.dvcli.action.BatchProcessor;
 import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import nl.knaw.dans.lib.dataverse.model.dataset.UpdateType;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
-import java.util.EnumSet;
 
 @Command(name = "publish",
          mixinStandardHelpOptions = true,
@@ -34,19 +34,46 @@ public class DatasetPublish extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
 
-    @Option(names={"-u", "--update-type"}, type =UpdateType.class, description ="'major' or 'minor' version update.")
-    private EnumSet<UpdateType> updateType = EnumSet.of(UpdateType.major);
+    static class PublishParams {
+        @ArgGroup(exclusive = true)
+        VersionUpdateType versionUpdateType;
 
-    @Option(names={"-a", "--assure-indexed"}, paramLabel = "assure-indexed", type = Boolean.class, description = "To make sure that indexing has already happened and it is set to 'true'.")
-    private boolean assureIsIndexed = true;
+        static class VersionUpdateType {
+            @Option(names = "--major", description = "Version update type: major (default)")
+            boolean major;
+            @Option(names = "--minor", description = "Version update type: minor")
+            boolean minor;
+        }
 
+        @Option(names = { "-a", "--assure-indexed" }, paramLabel = "assure-indexed", description = "Set to true to ensure that indexing has already happened before publish.")
+        private boolean assureIsIndexed = true;
+    }
+
+    @ArgGroup(exclusive = false)
+    PublishParams publishParams;
+
+   private UpdateType getUpdateType() {
+        if (publishParams != null && publishParams.versionUpdateType != null) {
+            if (publishParams.versionUpdateType.minor) {
+                return UpdateType.minor;
+            }
+        }
+        return UpdateType.major;
+    }
+
+    private boolean isAssureIndexed() {
+        if (publishParams != null)
+            return publishParams.assureIsIndexed;
+
+        return true;
+    }
 
     @Override
     public void doCall() throws IOException, DataverseException {
         BatchProcessor.<DatasetApi, String> builder()
             .labeledItems(datasetCmd.getItems())
             .action(d -> {
-                var r = d.publish();
+                var r = d.publish(this.getUpdateType(), this.isAssureIndexed());
                 return r.getEnvelopeAsString();
             })
             .report(new ConsoleReport<>())
@@ -54,7 +81,5 @@ public class DatasetPublish extends AbstractCmd {
             .build()
             .process();
     }
-
-    enum UpdateType {major, minor}
 
 }

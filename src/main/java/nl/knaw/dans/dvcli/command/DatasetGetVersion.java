@@ -17,7 +17,9 @@ package nl.knaw.dans.dvcli.command;
 
 import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
@@ -29,14 +31,22 @@ import java.io.IOException;
 public class DatasetGetVersion extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
-    @Parameters(index = "0", paramLabel = "version", description = "version to retrieve.")
-    String version;
+
+    @ArgGroup(exclusive = true, multiplicity = "1")
+    VersionInfo versionInfo;
+
+    static class VersionInfo {
+        @Parameters(description = "Specified a version to retrieve.")
+        String version = "";
+        @Option(names = "--all", description = "Get all versions")
+        boolean allVersions;
+    }
 
     @Override
     public void doCall() throws IOException, DataverseException {
         datasetCmd.batchProcessorBuilder()
             .action(d -> {
-                var r = d.getVersion(version);
+                var r = versionInfo.allVersions ? d.getAllVersions() : d.getVersion(versionInfo.version);
                 return r.getEnvelopeAsString();
             })
             .report(new ConsoleReport<>())
