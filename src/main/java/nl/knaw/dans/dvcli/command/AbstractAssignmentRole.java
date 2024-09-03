@@ -77,8 +77,8 @@ public abstract class AbstractAssignmentRole extends AbstractCmd {
                 var pid = csvRecord.get("PID");
                 DatasetApi datasetApi = datasetCmd.dataverseClient.dataset(pid);
                 RoleAssignment roleAssignment = new RoleAssignment();
-                roleAssignment.setRole(csvRecord.get("ROLE"));
                 roleAssignment.setAssignee(csvRecord.get("ASSIGNEE"));
+                roleAssignment.setRole(csvRecord.get("ROLE"));
 
                 RoleAssignmentParams params = new RoleAssignmentParams(datasetApi, Optional.of(roleAssignment));
                 result.add(new Pair<>(pid, params));

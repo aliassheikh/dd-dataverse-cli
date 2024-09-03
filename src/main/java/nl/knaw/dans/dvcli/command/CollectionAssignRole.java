@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Command(name = "assign-role",
          mixinStandardHelpOptions = true,
@@ -45,42 +46,54 @@ public class CollectionAssignRole extends AbstractCmd {
     private CollectionCmd collectionCmd;
 
     static class SingleAssignment {
+        @Parameters(index = "1", paramLabel = "assignee", description = "The identifier of the user to assign the role to, example: @user")
+        String assignee;
+
         @Parameters(index = "0", paramLabel = "role", description = "The role to assign")
         String role;
 
-        @Parameters(index = "1", paramLabel = "assignee", description = "The identifier of the user to assign the role to")
-        String assignee;
     }
 
     static class AllArgs {
         @ArgGroup(exclusive = false)
         SingleAssignment singleAssignment;
 
-        @Option(names = { "-f", "--parameters-file" }, description = "CSV file to read parameters from. The file should have a header row with columns 'PID', 'ROLE', and 'ASSIGNEE'.")
+        @Option(names = { "-f", "--parameters-file" }, description = "CSV file to read parameters from. The file should have a header row with columns 'PID', 'ASSIGNEE', and 'ROLE'.")
         Path paramsFile;
     }
 
-    @ArgGroup(exclusive = true, multiplicity = "1")
+    @ArgGroup(multiplicity = "1")
     private AllArgs allArgs;
 
-    private record RoleAssignmentParams(DataverseApi collection, String role, String assignee) {
+    private record RoleAssignmentParams(DataverseApi collection, Optional<RoleAssignment> roleAssignment) {
     }
 
     private static class RoleAssignmentAction implements ThrowingFunction<RoleAssignmentParams, String, Exception> {
         @Override
         public String apply(RoleAssignmentParams roleAssignmentParams) throws IOException, DataverseException {
-            var assignment = new RoleAssignment();
-            assignment.setAssignee(roleAssignmentParams.assignee());
-            assignment.setRole(roleAssignmentParams.role());
-            var r = roleAssignmentParams.collection.assignRole(assignment);
-            return r.getEnvelopeAsString();
+            if (roleAssignmentParams.roleAssignment().isPresent()) {
+                var r = roleAssignmentParams.collection.assignRole(roleAssignmentParams.roleAssignment().get());
+                return r.getEnvelopeAsString();
+            }
+
+            return "Nothing to Do";
         }
+    }
+
+    private Optional<RoleAssignment> readFromCommandLine() {
+        if (!allArgs.singleAssignment.assignee.isEmpty() && !allArgs.singleAssignment.role.isEmpty()) {
+            RoleAssignment roleAssignment = new RoleAssignment();
+            roleAssignment.setAssignee(this.allArgs.singleAssignment.assignee);
+            roleAssignment.setRole(this.allArgs.singleAssignment.role);
+            return Optional.of(roleAssignment);
+        }
+        return Optional.empty();
     }
 
     private List<Pair<String, RoleAssignmentParams>> readFromFile(Path file) throws IOException {
         try (Reader reader = Files.newBufferedReader(file);
             CSVParser csvParser = new CSVParser(reader, CSVFormat.Builder.create(CSVFormat.DEFAULT)
-                .setHeader("PID", "ROLE", "ASSIGNEE")
+                .setHeader("PID", "ASSIGNEE", "ROLE")
                 .setSkipHeaderRecord(true)
                 .build())) {
 
@@ -89,10 +102,11 @@ public class CollectionAssignRole extends AbstractCmd {
             for (CSVRecord csvRecord : csvParser) {
                 var pid = csvRecord.get("PID");
                 DataverseApi collection = collectionCmd.dataverseClient.dataverse(pid);
-                String role = csvRecord.get("ROLE");
-                String assignee = csvRecord.get("ASSIGNEE");
+                RoleAssignment roleAssignment = new RoleAssignment();
+                roleAssignment.setAssignee(csvRecord.get("ASSIGNEE"));
+                roleAssignment.setRole(csvRecord.get("ROLE"));
 
-                RoleAssignmentParams params = new RoleAssignmentParams(collection, role, assignee);
+                RoleAssignmentParams params = new RoleAssignmentParams(collection, Optional.of(roleAssignment));
                 result.add(new Pair<>(pid, params));
             }
 
@@ -106,7 +120,7 @@ public class CollectionAssignRole extends AbstractCmd {
         }
         else {
             return collectionCmd.getItems().stream()
-                .map(p -> new Pair<>(p.getFirst(), new RoleAssignmentParams(p.getSecond(), allArgs.singleAssignment.role, allArgs.singleAssignment.assignee)))
+                .map(p -> new Pair<>(p.getFirst(), new RoleAssignmentParams(p.getSecond(), readFromCommandLine())))
                 .toList();
         }
     }
