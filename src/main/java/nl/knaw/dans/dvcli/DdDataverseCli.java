@@ -32,6 +32,7 @@ import nl.knaw.dans.dvcli.command.CollectionPublish;
 import nl.knaw.dans.dvcli.command.CollectionSetMetadataBlocksRoot;
 import nl.knaw.dans.dvcli.command.CollectionView;
 import nl.knaw.dans.dvcli.command.DatasetCmd;
+import nl.knaw.dans.dvcli.command.DatasetValidateFiles;
 import nl.knaw.dans.dvcli.command.DeleteDraft;
 import nl.knaw.dans.dvcli.config.DdDataverseCliConfig;
 import nl.knaw.dans.lib.util.AbstractCommandLineApp;
@@ -72,6 +73,7 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
                 .addSubcommand(new CollectionSetMetadataBlocksRoot())
                 .addSubcommand(new CollectionView()))
             .addSubcommand(new CommandLine(new DatasetCmd(dataverseClient))
+                .addSubcommand(new DatasetValidateFiles())
                 .addSubcommand(new DeleteDraft())
             );
         log.debug("Configuring command line");
