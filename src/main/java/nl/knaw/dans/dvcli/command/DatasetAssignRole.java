@@ -38,7 +38,7 @@ public class DatasetAssignRole extends AbstractAssignmentRole {
                 var r = roleAssignmentParams.pid().assignRole(roleAssignmentParams.roleAssignment().get());
                 return r.getEnvelopeAsString();
             }
-            return "Nothing to Do";
+            return "There was no assignment-role to assign.";
         }
     }
 

@@ -76,7 +76,7 @@ public class CollectionAssignRole extends AbstractCmd {
                 return r.getEnvelopeAsString();
             }
 
-            return "Nothing to Do";
+            return "There was no assignment-role to assign.";
         }
     }
 
