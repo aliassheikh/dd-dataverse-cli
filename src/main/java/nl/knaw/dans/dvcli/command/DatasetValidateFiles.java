@@ -29,7 +29,7 @@ import java.util.List;
 
 @Command(name = "validate-files",
          mixinStandardHelpOptions = true,
-         description = " Make sure that all files have correctly stored in object storage.")
+         description = "Make sure that all files are correctly stored in object storage.")
 public class DatasetValidateFiles extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
