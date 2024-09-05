@@ -15,9 +15,6 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.BatchProcessor;
-import nl.knaw.dans.dvcli.action.ConsoleReport;
-import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import nl.knaw.dans.lib.dataverse.model.dataset.UpdateType;
 import picocli.CommandLine.ArgGroup;
@@ -52,7 +49,7 @@ public class DatasetPublish extends AbstractCmd {
     @ArgGroup(exclusive = false)
     PublishParams publishParams;
 
-   private UpdateType getUpdateType() {
+    private UpdateType getUpdateType() {
         if (publishParams != null && publishParams.versionUpdateType != null) {
             if (publishParams.versionUpdateType.minor) {
                 return UpdateType.minor;
@@ -70,16 +67,10 @@ public class DatasetPublish extends AbstractCmd {
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        BatchProcessor.<DatasetApi, String> builder()
-            .labeledItems(datasetCmd.getItems())
-            .action(d -> {
-                var r = d.publish(this.getUpdateType(), this.isAssureIndexed());
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .delay(1000L)
-            .build()
-            .process();
+        datasetCmd.batchProcessor(dataset -> dataset
+            .publish(this.getUpdateType(), this.isAssureIndexed())
+            .getEnvelopeAsString()
+        ).process();
     }
 
 }

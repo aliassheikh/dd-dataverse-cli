@@ -34,7 +34,6 @@ import nl.knaw.dans.dvcli.command.CollectionView;
 import nl.knaw.dans.dvcli.command.DatasetAssignRole;
 import nl.knaw.dans.dvcli.command.DatasetCmd;
 import nl.knaw.dans.dvcli.command.DatasetDeleteDraft;
-import nl.knaw.dans.dvcli.command.DatasetDeleteRole;
 import nl.knaw.dans.dvcli.command.DatasetGetFiles;
 import nl.knaw.dans.dvcli.command.DatasetGetLatestVersion;
 import nl.knaw.dans.dvcli.command.DatasetGetVersion;
@@ -81,7 +80,6 @@ public class DdDataverseCli extends AbstractCommandLineApp<DdDataverseCliConfig>
             .addSubcommand(new CommandLine(new DatasetCmd(dataverseClient))
                 .addSubcommand(new DatasetAssignRole())
                 .addSubcommand(new DatasetDeleteDraft())
-                .addSubcommand(new DatasetDeleteRole())
                 .addSubcommand(new DatasetGetFiles())
                 .addSubcommand(new DatasetGetLatestVersion())
                 .addSubcommand(new DatasetGetVersion())

@@ -103,8 +103,5 @@ public abstract class AbstractAssignmentRole extends AbstractCmd {
     protected record RoleAssignmentParams(DatasetApi pid, Optional<RoleAssignment> roleAssignment) {
     }
 
-    @Override
-    public void doCall() throws IOException, DataverseException {
-    }
 
 }

@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
@@ -31,13 +30,6 @@ public class CollectionView extends AbstractCmd {
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
-            .action(d -> {
-                var r = d.view();
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .build()
-            .process();
+        collectionCmd.batchProcessor(c -> c.view().getEnvelopeAsString()).process();
     }
 }
