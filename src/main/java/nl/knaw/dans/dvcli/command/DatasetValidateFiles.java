@@ -34,12 +34,9 @@ public class DatasetValidateFiles extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
 
-    protected List<Pair<String, IdParam>> getIds(DatasetCmd datasetCmd) throws IOException {
+    protected List<Pair<String, IdParam>> getIds() throws IOException {
         List<String> pids = new SingleIdOrIdsFile(datasetCmd.targets, SingleIdOrIdsFile.DEFAULT_TARGET_PLACEHOLDER).getPids().toList();
-        if (!pids.isEmpty())
-            return pids.stream().map(p -> new Pair<>(p, new IdParam(datasetCmd.dataverseClient.admin(), p))).toList();
-
-        return List.of();
+        return pids.stream().map(p -> new Pair<>(p, new IdParam(datasetCmd.dataverseClient.admin(), p))).toList();
     }
 
     protected record IdParam(AdminApi admin, String id) {
@@ -56,7 +53,7 @@ public class DatasetValidateFiles extends AbstractCmd {
     @Override
     public void doCall() throws IOException, DataverseException {
         datasetCmd.<IdParam> paramsBatchProcessorBuilder()
-            .labeledItems(getIds(datasetCmd))
+            .labeledItems(getIds())
             .action(new ValidateFilesAction())
             .report(new ConsoleReport<>())
             .build()
