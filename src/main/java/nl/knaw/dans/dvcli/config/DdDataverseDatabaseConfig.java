@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
 
-import lombok.RequiredArgsConstructor;
-import nl.knaw.dans.lib.dataverse.DataverseException;
+package nl.knaw.dans.dvcli.config;
 
-import java.io.IOException;
-import java.util.concurrent.Callable;
+import lombok.Data;
 
-@RequiredArgsConstructor
-public abstract class AbstractCmd implements Callable<Integer> {
-    @Override
-    public Integer call() throws Exception {
-        try {
-            doCall();
-            return 0;
-        }
-        catch (DataverseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
-    }
+import javax.validation.constraints.NotEmpty;
 
-    public abstract void doCall() throws Exception;
+@Data
+public class DdDataverseDatabaseConfig {
+    
+    @NotEmpty
+    private String host = "localhost";
+    
+    @NotEmpty
+    private String database = "dvndb";
+    
+    @NotEmpty
+    private String user = "dvnuser";
+
+    @NotEmpty
+    private String password = "dvnsecret";
 }
+
