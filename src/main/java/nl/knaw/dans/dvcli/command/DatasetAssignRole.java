@@ -15,28 +15,37 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
+import nl.knaw.dans.dvcli.action.Pair;
 import nl.knaw.dans.dvcli.action.ThrowingFunction;
+import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Command(name = "assign-role",
          mixinStandardHelpOptions = true,
          description = "Manage role assignments on one or more datasets.")
 
-public class DatasetAssignRole extends AbstractAssignmentRole {
+public class DatasetAssignRole extends AbstractAssignmentRole<DatasetCmd, DatasetApi> {
     @ParentCommand
     DatasetCmd datasetCmd;
 
-    private static class RoleAssignmentAction implements ThrowingFunction<RoleAssignmentParams, String, Exception> {
+    @Override
+    protected DatasetApi getItem(String pid) {
+        return datasetCmd.dataverseClient.dataset(pid);
+    }
+
+    private static class RoleAssignmentAction implements ThrowingFunction<RoleAssignmentParams<DatasetApi>, String, Exception> {
         @Override
-        public String apply(RoleAssignmentParams roleAssignmentParams) throws IOException, DataverseException {
+        public String apply(RoleAssignmentParams<DatasetApi> roleAssignmentParams) throws IOException, DataverseException {
             if (roleAssignmentParams.roleAssignment().isPresent()) {
-                var r = roleAssignmentParams.pid().assignRole(roleAssignmentParams.roleAssignment().get());
-                return r.getEnvelopeAsString();
+                var api = roleAssignmentParams.pid();
+                var assignment = roleAssignmentParams.roleAssignment().get();
+                return api.assignRole(assignment).getEnvelopeAsString();
             }
             return "There was no assignment-role to assign.";
         }
@@ -44,12 +53,10 @@ public class DatasetAssignRole extends AbstractAssignmentRole {
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        datasetCmd.<RoleAssignmentParams> paramsBatchProcessorBuilder()
+        datasetCmd.<RoleAssignmentParams<DatasetApi>> paramsBatchProcessorBuilder()
             .labeledItems(getRoleAssignmentParams(datasetCmd))
             .action(new RoleAssignmentAction())
-            .report(new ConsoleReport<>())
             .build()
             .process();
     }
-
 }
