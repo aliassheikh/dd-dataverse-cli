@@ -19,10 +19,14 @@ package nl.knaw.dans.dvcli.config;
 import io.dropwizard.core.Configuration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import nl.knaw.dans.lib.util.DataverseClientFactory;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DdDataverseCliConfig extends Configuration {
-    private DataverseClientFactory dataverse;
+    private DataverseClientFactory api;
+    
+    @NonNull
+    private DdDataverseDatabaseConfig db = new DdDataverseDatabaseConfig();
 }
