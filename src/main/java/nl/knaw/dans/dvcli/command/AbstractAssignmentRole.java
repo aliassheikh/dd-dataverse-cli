@@ -16,8 +16,6 @@
 package nl.knaw.dans.dvcli.command;
 
 import nl.knaw.dans.dvcli.action.Pair;
-import nl.knaw.dans.lib.dataverse.DatasetApi;
-import nl.knaw.dans.lib.dataverse.DataverseException;
 import nl.knaw.dans.lib.dataverse.model.RoleAssignment;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -36,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Command
-public abstract class AbstractAssignmentRole extends AbstractCmd {
+public abstract class AbstractAssignmentRole<CMD extends AbstractSubcommandContainer<?>, API> extends AbstractCmd {
 /*    @ParentCommand
     protected DatasetCmd datasetCmd;*/
 
@@ -64,23 +62,23 @@ public abstract class AbstractAssignmentRole extends AbstractCmd {
         return Optional.empty();
     }
 
-    private List<Pair<String, RoleAssignmentParams>> readFromFile(DatasetCmd datasetCmd) throws IOException {
+    private List<Pair<String, RoleAssignmentParams<API>>> readFromFile(CMD cmd) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(commandParameter.parameterFile);
             CSVParser csvParser = new CSVParser(reader, CSVFormat.Builder.create(CSVFormat.DEFAULT)
                 .setHeader("PID", "ASSIGNEE", "ROLE")
                 .setSkipHeaderRecord(true)
                 .build())) {
 
-            List<Pair<String, RoleAssignmentParams>> result = new ArrayList<>();
+            List<Pair<String, RoleAssignmentParams<API>>> result = new ArrayList<>();
 
             for (CSVRecord csvRecord : csvParser) {
                 var pid = csvRecord.get("PID");
-                DatasetApi datasetApi = datasetCmd.dataverseClient.dataset(pid);
+                API api = getItem(pid);
                 RoleAssignment roleAssignment = new RoleAssignment();
                 roleAssignment.setAssignee(csvRecord.get("ASSIGNEE"));
                 roleAssignment.setRole(csvRecord.get("ROLE"));
 
-                RoleAssignmentParams params = new RoleAssignmentParams(datasetApi, Optional.of(roleAssignment));
+                RoleAssignmentParams<API> params = new RoleAssignmentParams<>(api, Optional.of(roleAssignment));
                 result.add(new Pair<>(pid, params));
             }
 
@@ -88,20 +86,24 @@ public abstract class AbstractAssignmentRole extends AbstractCmd {
         }
     }
 
-    protected List<Pair<String, RoleAssignmentParams>> getRoleAssignmentParams(DatasetCmd datasetCmd) throws IOException {
+    protected abstract API getItem(String pid);
+
+    protected List<Pair<String, RoleAssignmentParams<API>>> getRoleAssignmentParams(CMD cmd) throws IOException {
         if (commandParameter.parameterFile != null) {
-            return readFromFile(datasetCmd);
+            return readFromFile(cmd);
         }
         else if (commandParameter.assignment != null) {
-            return datasetCmd.getItems().stream()
-                .map(p -> new Pair<>(p.getFirst(), new RoleAssignmentParams(p.getSecond(), readFromCommandLine())))
+            var items = cmd.getItems();
+            return items.stream()
+                .map(p -> {
+                    var second = new RoleAssignmentParams<API>((API) p.getSecond(), readFromCommandLine());
+                    return new Pair<>(p.getFirst(), second);
+                })
                 .toList();
         }
         return List.of();
     }
 
-    protected record RoleAssignmentParams(DatasetApi pid, Optional<RoleAssignment> roleAssignment) {
+    protected record RoleAssignmentParams<A>(A pid, Optional<RoleAssignment> roleAssignment) {
     }
-
-
 }
