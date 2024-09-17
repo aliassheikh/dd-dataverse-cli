@@ -20,20 +20,25 @@ import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.dvcli.action.ThrowingFunction;
 import nl.knaw.dans.lib.dataverse.DataverseApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import nl.knaw.dans.lib.dataverse.model.RoleAssignment;
+import nl.knaw.dans.lib.dataverse.model.RoleAssignmentReadOnly;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Command(name = "role-assignment",
          mixinStandardHelpOptions = true,
          description = "Manage role assignments.",
-         subcommands = { CollectionRoleAssignment.CollectionListRoleAssignments.class, CollectionRoleAssignment.CollectionAssignRole.class })
+         subcommands = { CollectionRoleAssignment.CollectionListRoleAssignments.class, CollectionRoleAssignment.CollectionAssignRole.class, CollectionRoleAssignment.CollectionDeleteRole.class })
 public class CollectionRoleAssignment extends AbstractCmd {
     @ParentCommand
     static private CollectionCmd collectionCmd;
 
-    @Command(name = "list", mixinStandardHelpOptions = true, description = "List the role assignments of a Dataverse collection.")
+    @Command(name = "list",
+             mixinStandardHelpOptions = true,
+             description = "List the role assignments of a Dataverse collection.")
     static class CollectionListRoleAssignments extends AbstractCmd {
 
         @Override
@@ -67,6 +72,43 @@ public class CollectionRoleAssignment extends AbstractCmd {
             collectionCmd.<RoleAssignmentParams<DataverseApi>> paramsBatchProcessorBuilder()
                 .labeledItems(getRoleAssignmentParams(collectionCmd))
                 .action(new RoleAssignmentAction())
+                .report(new ConsoleReport<>())
+                .build()
+                .process();
+        }
+    }
+
+    @Command(name = "remove",
+             mixinStandardHelpOptions = true,
+             description = "remove a role assignment from the specified dataverse collection")
+    static class CollectionDeleteRole extends AbstractAssignmentRole<CollectionCmd, DataverseApi> {
+
+        @Override
+        protected DataverseApi getItem(String pid) {
+            return collectionCmd.dataverseClient.dataverse(pid);
+        }
+
+        private static class RoleAssignmentAction implements ThrowingFunction<RoleAssignmentParams<DataverseApi>, String, Exception> {
+            @Override
+            public String apply(RoleAssignmentParams<DataverseApi> roleAssignmentParams) throws IOException, DataverseException {
+                if (roleAssignmentParams.roleAssignment().isPresent()) {
+                    RoleAssignment roleAssignment = roleAssignmentParams.roleAssignment().get();
+                    Optional<RoleAssignmentReadOnly> role = roleAssignmentParams.pid().listRoleAssignments().getData().stream()
+                        .filter(r -> r.get_roleAlias().equals(roleAssignment.getRole()) && r.getAssignee().equals(roleAssignment.getAssignee())).findFirst();
+                    if (role.isPresent()) {
+                        var r = roleAssignmentParams.pid().deleteRoleAssignment(role.get().getId());
+                        return r.getEnvelopeAsString();
+                    }
+                }
+                return "There was no assignment-role to assign.";
+            }
+        }
+
+        @Override
+        public void doCall() throws IOException, DataverseException {
+            collectionCmd.<RoleAssignmentParams<DataverseApi>> paramsBatchProcessorBuilder()
+                .labeledItems(getRoleAssignmentParams(collectionCmd))
+                .action(new CollectionRoleAssignment.CollectionDeleteRole.RoleAssignmentAction())
                 .report(new ConsoleReport<>())
                 .build()
                 .process();

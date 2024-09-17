@@ -35,15 +35,13 @@ import java.util.Optional;
 
 @Command
 public abstract class AbstractAssignmentRole<CMD extends AbstractSubcommandContainer<?>, API> extends AbstractCmd {
-/*    @ParentCommand
-    protected DatasetCmd datasetCmd;*/
 
     static class CommandParameter {
-        @Parameters(description = "alias and role assignee (example: @dataverseAdmin=contributor)")
+        @Parameters(description = "Alias and role assignee (example: @dataverseAdmin=contributor)")
         String assignment = "";
 
         @Option(names = { "-f",
-            "--parameter-file" }, description = "CSV file to read parameters from. The file should have a header row with columns 'PID', 'ROLE', and 'ASSIGNMENT'.")
+            "--parameter-file" }, description = "CSV file to read parameters from. The file should have a header row with columns 'PID', 'ASSIGNEE' and 'ROLE'.")
         Path parameterFile;
     }
 

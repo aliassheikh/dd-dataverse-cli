@@ -20,20 +20,25 @@ import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.dvcli.action.ThrowingFunction;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import nl.knaw.dans.lib.dataverse.model.RoleAssignment;
+import nl.knaw.dans.lib.dataverse.model.RoleAssignmentReadOnly;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Command(name = "role-assignment",
          mixinStandardHelpOptions = true,
          description = "Manage role assignments.",
-         subcommands = { DatasetRoleAssignment.DatasetListRoleAssignments.class, DatasetRoleAssignment.DatasetAssignRole.class })
+         subcommands = { DatasetRoleAssignment.DatasetListRoleAssignments.class, DatasetRoleAssignment.DatasetAssignRole.class, DatasetRoleAssignment.DatasetDeleteRole.class })
 public class DatasetRoleAssignment extends AbstractCmd {
     @ParentCommand
     static private DatasetCmd datasetCmd;
 
-    @Command(name = "list", mixinStandardHelpOptions = true, description = "List role assignments for the specified dataset.")
+    @Command(name = "list",
+             mixinStandardHelpOptions = true,
+             description = "List role assignments for the specified dataset.")
     static class DatasetListRoleAssignments extends AbstractCmd {
 
         @Override
@@ -72,6 +77,43 @@ public class DatasetRoleAssignment extends AbstractCmd {
                 .process();
         }
 
+    }
+
+    @Command(name = "remove",
+             mixinStandardHelpOptions = true,
+             description = "remove role assignment from specified dataset(s)")
+    static class DatasetDeleteRole extends AbstractAssignmentRole<DatasetCmd, DatasetApi> {
+
+        @Override
+        protected DatasetApi getItem(String pid) {
+            return datasetCmd.dataverseClient.dataset(pid);
+        }
+
+        private static class RoleAssignmentAction implements ThrowingFunction<RoleAssignmentParams<DatasetApi>, String, Exception> {
+            @Override
+            public String apply(RoleAssignmentParams<DatasetApi> roleAssignmentParams) throws IOException, DataverseException {
+                if (roleAssignmentParams.roleAssignment().isPresent()) {
+                    RoleAssignment roleAssignment = roleAssignmentParams.roleAssignment().get();
+                    Optional<RoleAssignmentReadOnly> role = roleAssignmentParams.pid().listRoleAssignments().getData().stream()
+                        .filter(r -> r.get_roleAlias().equals(roleAssignment.getRole()) && r.getAssignee().equals(roleAssignment.getAssignee())).findFirst();
+                    if (role.isPresent()) {
+                        var r = roleAssignmentParams.pid().deleteRoleAssignment(role.get().getId());
+                        return r.getEnvelopeAsString();
+                    }
+                }
+                return "There was no assignment-role to assign.";
+            }
+        }
+
+        @Override
+        public void doCall() throws IOException, DataverseException {
+            datasetCmd.<RoleAssignmentParams<DatasetApi>> paramsBatchProcessorBuilder()
+                .labeledItems(getRoleAssignmentParams(datasetCmd))
+                .action(new RoleAssignmentAction())
+                .report(new ConsoleReport<>())
+                .build()
+                .process();
+        }
     }
 
     @Override
