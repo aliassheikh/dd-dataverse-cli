@@ -29,12 +29,13 @@ import java.util.List;
          mixinStandardHelpOptions = true,
          description = "Manage Dataverse collections (i.e. 'dataverses')")
 public class CollectionCmd extends AbstractSubcommandContainer<DataverseApi> {
+    public CollectionCmd(@NonNull DataverseClient dataverseClient) {
+        super(dataverseClient);
+    }
+
     @Override
     protected List<Pair<String, DataverseApi>> getItems() throws IOException {
         return new SingleCollectionOrCollectionsFile(targets, dataverseClient).getCollections().toList();
     }
 
-    public CollectionCmd(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
 }

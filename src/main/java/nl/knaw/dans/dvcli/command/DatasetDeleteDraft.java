@@ -21,15 +21,15 @@ import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "list-metadata-blocks",
+@Command(name = "delete-draft",
          mixinStandardHelpOptions = true,
-         description = "Get a list of metadata blocks defined on a dataverse collection.")
-public class CollectionListMetadataBlocks extends AbstractCmd {
+         description = "Delete the draft version of a dataset.")
+public class DatasetDeleteDraft extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
+    private DatasetCmd datasetCmd;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessor(c -> c.listMetadataBlocks().getEnvelopeAsString()).process();
+        datasetCmd.batchProcessor(d -> d.deleteDraft().getEnvelopeAsString()).process();
     }
 }

@@ -15,29 +15,25 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "list-role-assignments",
+@Command(name = "get-files",
          mixinStandardHelpOptions = true,
-         description = "List the role assignments of a Dataverse collection.")
-public class CollectionListRoleAssignments extends AbstractCmd {
+         description = "Get a list of file metadata.")
+public class DatasetGetFiles extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
+    private DatasetCmd datasetCmd;
+
+    @Parameters(index = "0", paramLabel = "version", description = "version to get file metadata from.")
+    private String version;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
-            .action(d -> {
-                var r = d.listRoleAssignments();
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .build()
-            .process();
+        datasetCmd.batchProcessor(d -> d.getFiles(version).getEnvelopeAsString()).process();
     }
 }

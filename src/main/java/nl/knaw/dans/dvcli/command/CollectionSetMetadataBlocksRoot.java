@@ -15,10 +15,9 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
@@ -30,18 +29,11 @@ public class CollectionSetMetadataBlocksRoot extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    @CommandLine.Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
+    @Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
     private Boolean isRoot;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
-            .action(d -> {
-                var r = d.setMetadataBlocksRoot(isRoot);
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .build()
-            .process();
+        collectionCmd.batchProcessor(c -> c.setMetadataBlocksRoot(isRoot).getEnvelopeAsString()).process();
     }
 }

@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.dvcli.command;
 
-import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -43,14 +42,7 @@ public class CollectionCreateDataset extends AbstractCmd {
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessorBuilder()
-            .action(d -> {
-                var json = Files.readString(Path.of(dataset));
-                var r = d.createDataset(json, metadataKeys);
-                return r.getEnvelopeAsString();
-            })
-            .report(new ConsoleReport<>())
-            .build()
-            .process();
+        collectionCmd.batchProcessor(c ->
+            c.createDataset(Files.readString(Path.of(dataset)), metadataKeys).getEnvelopeAsString()).process();
     }
 }
