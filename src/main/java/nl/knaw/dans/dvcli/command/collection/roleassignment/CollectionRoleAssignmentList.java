@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.collection.roleassignment;
 
-import lombok.NonNull;
-import nl.knaw.dans.dvcli.action.Pair;
-import nl.knaw.dans.dvcli.action.SingleCollectionOrCollectionsFile;
-import nl.knaw.dans.lib.dataverse.DataverseApi;
-import nl.knaw.dans.lib.dataverse.DataverseClient;
+import nl.knaw.dans.dvcli.command.AbstractCmd;
+import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
-import java.util.List;
 
-@Command(name = "collection",
+@Command(name = "list",
          mixinStandardHelpOptions = true,
-         description = "Manage Dataverse collections (i.e. 'dataverses')")
-public class CollectionCmd extends AbstractSubcommandContainer<DataverseApi> {
-    public CollectionCmd(@NonNull DataverseClient dataverseClient) {
-        super(dataverseClient);
-    }
+         description = "List role assignments in a Dataverse collection.")
+public class CollectionRoleAssignmentList extends AbstractCmd {
+    @ParentCommand
+    private CollectionRoleAssignment collectionRoleAssignment;
 
     @Override
-    protected List<Pair<String, DataverseApi>> getItems() throws IOException {
-        return new SingleCollectionOrCollectionsFile(targets, dataverseClient).getCollections().toList();
+    public void doCall() throws DataverseException, IOException {
+        collectionRoleAssignment.getCollectionCmd().batchProcessor(d -> d.listRoleAssignments().getEnvelopeAsString()).process();
     }
-
 }

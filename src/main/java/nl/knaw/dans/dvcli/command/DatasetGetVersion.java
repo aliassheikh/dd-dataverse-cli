@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import nl.knaw.dans.dvcli.command.dataset.DatasetCmd;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;

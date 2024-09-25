@@ -18,6 +18,7 @@ package nl.knaw.dans.dvcli.command;
 
 import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.dvcli.action.ThrowingFunction;
+import nl.knaw.dans.dvcli.command.dataset.DatasetCmd;
 import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import nl.knaw.dans.lib.dataverse.model.RoleAssignment;

@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.dataset;
 
+import nl.knaw.dans.dvcli.command.AbstractCmd;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "delete",
+@Command(name = "get-files",
          mixinStandardHelpOptions = true,
-         description = "Delete a Dataverse collection.")
-public class CollectionDelete extends AbstractCmd {
+         description = "Get a list of file metadata.")
+public class DatasetGetFiles extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
+    private DatasetCmd datasetCmd;
+
+    @Parameters(index = "0", paramLabel = "version", description = "version to get file metadata from.")
+    private String version;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessor(c -> c.delete().getEnvelopeAsString()).process();
+        datasetCmd.batchProcessor(d -> d.getFiles(version).getEnvelopeAsString()).process();
     }
 }

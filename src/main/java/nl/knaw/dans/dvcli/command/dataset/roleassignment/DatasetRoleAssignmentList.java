@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.dataset.roleassignment;
 
+import nl.knaw.dans.dvcli.command.AbstractCmd;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "publish",
+@Command(name = "list",
          mixinStandardHelpOptions = true,
-         description = "Publish a dataverse collection.")
-public class CollectionPublish extends AbstractCmd {
+         description = "List role assignments for the specified dataset.")
+public class DatasetRoleAssignmentList extends AbstractCmd {
     @ParentCommand
-    private CollectionCmd collectionCmd;
+    private DatasetRoleAssignment datasetRoleAssignment;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessor(c -> c.publish().getEnvelopeAsString()).process();
+        datasetRoleAssignment.getDatasetCmd().batchProcessor(d -> d.listRoleAssignments().getEnvelopeAsString()).process();
     }
 }

@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.collection.roleassignment;
 
-import lombok.RequiredArgsConstructor;
-import nl.knaw.dans.lib.dataverse.DataverseException;
+import lombok.Getter;
+import nl.knaw.dans.dvcli.command.AbstractCmd;
+import nl.knaw.dans.dvcli.command.collection.CollectionCmd;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.ParentCommand;
 
-import java.util.concurrent.Callable;
+@Command(name = "role-assignment",
+         mixinStandardHelpOptions = true,
+         description = "Manage role assignments.")
+@Getter
+public class CollectionRoleAssignment extends AbstractCmd {
+    @ParentCommand
+    private CollectionCmd collectionCmd;
 
-@RequiredArgsConstructor
-public abstract class AbstractCmd implements Callable<Integer> {
     @Override
-    public Integer call() throws Exception {
-        try {
-            doCall();
-            return 0;
-        }
-        catch (DataverseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
+    public void doCall() {
+        // do nothing
     }
-
-    public abstract void doCall() throws Exception;
 }

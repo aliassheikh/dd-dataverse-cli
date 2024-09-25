@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.collection;
 
+import nl.knaw.dans.dvcli.command.AbstractCmd;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "set-metadata-blocks-root",
+@Command(name = "list-roles",
          mixinStandardHelpOptions = true,
-         description = "Configure a dataverse collection to inherit its metadata blocks from its parent.")
-public class CollectionSetMetadataBlocksRoot extends AbstractCmd {
+         description = "Get a list of roles defined in a dataverse collection.")
+public class CollectionListRoles extends AbstractCmd {
     @ParentCommand
     private CollectionCmd collectionCmd;
 
-    @Parameters(index = "0", paramLabel = "isRoot", type = Boolean.class, description = "Whether to make it a metadata blocks root.")
-    private Boolean isRoot;
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        collectionCmd.batchProcessor(c -> c.setMetadataBlocksRoot(isRoot).getEnvelopeAsString()).process();
+        collectionCmd.batchProcessor(c -> c.listRoles().getEnvelopeAsString()).process();
     }
 }

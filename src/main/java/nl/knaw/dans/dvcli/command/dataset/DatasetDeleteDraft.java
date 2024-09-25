@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.dataset;
 
-import lombok.RequiredArgsConstructor;
+import nl.knaw.dans.dvcli.command.AbstractCmd;
 import nl.knaw.dans.lib.dataverse.DataverseException;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.ParentCommand;
 
-import java.util.concurrent.Callable;
+import java.io.IOException;
 
-@RequiredArgsConstructor
-public abstract class AbstractCmd implements Callable<Integer> {
+@Command(name = "delete-draft",
+         mixinStandardHelpOptions = true,
+         description = "Delete the draft version of a dataset.")
+public class DatasetDeleteDraft extends AbstractCmd {
+    @ParentCommand
+    private DatasetCmd datasetCmd;
+
     @Override
-    public Integer call() throws Exception {
-        try {
-            doCall();
-            return 0;
-        }
-        catch (DataverseException e) {
-            System.err.println(e.getMessage());
-            return 1;
-        }
+    public void doCall() throws IOException, DataverseException {
+        datasetCmd.batchProcessor(d -> d.deleteDraft().getEnvelopeAsString()).process();
     }
-
-    public abstract void doCall() throws Exception;
 }

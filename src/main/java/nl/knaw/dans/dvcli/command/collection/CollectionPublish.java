@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.dvcli.command;
+package nl.knaw.dans.dvcli.command.collection;
 
+import nl.knaw.dans.dvcli.command.AbstractCmd;
 import nl.knaw.dans.lib.dataverse.DataverseException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 import java.io.IOException;
 
-@Command(name = "delete-draft",
+@Command(name = "publish",
          mixinStandardHelpOptions = true,
-         description = "Delete the draft version of a dataset.")
-public class DatasetDeleteDraft extends AbstractCmd {
+         description = "Publish a dataverse collection.")
+public class CollectionPublish extends AbstractCmd {
     @ParentCommand
-    private DatasetCmd datasetCmd;
+    private CollectionCmd collectionCmd;
 
     @Override
     public void doCall() throws IOException, DataverseException {
-        datasetCmd.batchProcessor(d -> d.deleteDraft().getEnvelopeAsString()).process();
+        collectionCmd.batchProcessor(c -> c.publish().getEnvelopeAsString()).process();
     }
 }
