@@ -27,29 +27,27 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-@Command(name = "delete-metadata", description = """
-    Delete metadata fields from a dataset. The fields to delete can be specified as command line options or in a CSV file. The dataset will be in draft state after the operation.
-    """)
+@Command(name = "delete-metadata",
+         mixinStandardHelpOptions = true,
+         description = """
+             Delete metadata fields from a dataset. The fields to delete can be specified as command line options or in a CSV file. The dataset will be in draft state after the operation.
+             """)
 public class DatasetDeleteMetadata extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
 
     static class FieldValueOrParameterFile {
         @Option(names = { "-f",
-            "--field-value" }, description = """
-            Field name and value to delete. If the field is a compound field, multiple field-values specified together will be treated as a single compound field. If you need to 
-            delete multiple values from the same field, you have to call this command multiple times.
-            The format is: field-name=field-value. For example, to delete a field named 'alternativeTitle' with value 'Some title', use --field-value 'alternativeTitle=Some title'.
-            For compound fields, the field name must be prefixed with the field name of the parent field e.g., 'author.authorName' for the subfield 'authorName' of the compound field 'author'.
-            If the field is repeatable, you must add an asterisk (*) at the end of the field name.
-            """)
+            "--field-value" }, description = "Field name and value to delete. If the field is a compound field, multiple field-values specified together will be treated as a single compound field. "
+            + "If you need to delete multiple values from the same field, you have to call this command multiple times. "
+            + "The format is: field-name=field-value. For example, to delete a field named 'alternativeTitle' with value 'Some title', use --field-value 'alternativeTitle=Some title'. "
+            + "For compound fields, the field name must be prefixed with the field name of the parent field e.g., 'author.authorName' for the subfield 'authorName' of the compound field 'author'. "
+            + "If the field is repeatable, you must add an asterisk (*) at the end of the field name.")
         private List<String> fieldValues;
 
-        @Option(names = { "-p", "--parameters-file" }, description = """
-                Path to a CSV file containing the field names and values to delete. The file must have a header row with the field names. Each subsequent row must contain the field values.
-                There must be a column 'PID' containing the dataset persistent identifier. The other column headers must match field names in the dataset metadata. Compound fields must be specified as
-                'parentField.childField'. If you need to delete multiple fields from one dataset, use multiple rows in the CSV file.
-            """)
+        @Option(names = { "-p", "--parameters-file" }, description = "Path to a CSV file containing the field names and values to delete. The file must have a header row with the field names. "
+            + "Each subsequent row must contain the field values. There must be a column 'PID' containing the dataset persistent identifier. The other column headers must match field names in "
+            + "the dataset metadata. Compound fields must be specified as 'parentField.childField'. If you need to delete multiple fields from one dataset, use multiple rows in the CSV file.")
         private Path parametersFile;
     }
 
