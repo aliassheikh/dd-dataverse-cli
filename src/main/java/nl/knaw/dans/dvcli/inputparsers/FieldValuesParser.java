@@ -20,22 +20,22 @@ import nl.knaw.dans.lib.dataverse.CompoundFieldBuilder;
 import nl.knaw.dans.lib.dataverse.model.dataset.MetadataField;
 import nl.knaw.dans.lib.dataverse.model.dataset.PrimitiveMultiValueField;
 import nl.knaw.dans.lib.dataverse.model.dataset.PrimitiveSingleValueField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @AllArgsConstructor
 public class FieldValuesParser {
-    private final List<String> values;
+    private final Map<String, String> keyValues;
 
-    public List<MetadataField> parse() {
-        Map<String, String> keyValues = new HashMap<>();
-
-        for (var value : values) {
-            String[] split = value.split("=", 2);
-            keyValues.put(checkValidName(split[0]), split[1]);
+    public Set<MetadataField> parse() {
+        for (var key : keyValues.keySet()) {
+            checkValidName(key);
         }
 
         Map<String, Map<String, String>> compoundFields = new HashMap<>();
@@ -56,14 +56,16 @@ public class FieldValuesParser {
             keyValues.remove(key);
         }
 
-        List<MetadataField> result = new ArrayList<>();
+        Set<MetadataField> result = new HashSet<>();
 
         for (var key : keyValues.keySet()) {
-            if (key.endsWith("*")) {
-                result.add(new PrimitiveMultiValueField(key.substring(0, key.length() - 1), List.of(keyValues.get(key))));
-            }
-            else {
-                result.add(new PrimitiveSingleValueField(key, keyValues.get(key)));
+            if (StringUtils.isNotBlank(keyValues.get(key))) {
+                if (key.endsWith("*")) {
+                    result.add(new PrimitiveMultiValueField(key.substring(0, key.length() - 1), List.of(keyValues.get(key))));
+                }
+                else {
+                    result.add(new PrimitiveSingleValueField(key, keyValues.get(key)));
+                }
             }
         }
 
@@ -71,27 +73,38 @@ public class FieldValuesParser {
             Map<String, String> subfields = compoundFields.get(parent);
             if (parent.endsWith("*")) {
                 var builder = new CompoundFieldBuilder(parent.substring(0, parent.length() - 1), true);
+                boolean hasValues = false;
                 for (var subfield : subfields.keySet()) {
-                    builder.addSubfield(subfield, subfields.get(subfield));
+                    if (StringUtils.isNotBlank(subfields.get(subfield))) {
+                        builder.addSubfield(subfield, subfields.get(subfield));
+                        hasValues = true;
+                    }
                 }
-                result.add(builder.build());
+                if (hasValues) {
+                    result.add(builder.build());
+                }
             }
             else {
                 var builder = new CompoundFieldBuilder(parent, false);
+                boolean hasValues = false;
                 for (var subfield : subfields.keySet()) {
-                    builder.addSubfield(subfield, subfields.get(subfield));
+                    if (StringUtils.isNotBlank(subfields.get(subfield))) {
+                        builder.addSubfield(subfield, subfields.get(subfield));
+                        hasValues = true;
+                    }
                 }
-                result.add(builder.build());
+                if (hasValues) {
+                    result.add(builder.build());
+                }
             }
         }
 
         return result;
     }
 
-    private String checkValidName(String name) {
+    private void checkValidName(String name) {
         if (!name.matches("[a-zA-Z0-9]+\\*?(\\.[a-zA-Z0-9]+)?")) {
             throw new IllegalArgumentException("Invalid field name: " + name);
         }
-        return name;
     }
 }

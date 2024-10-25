@@ -29,6 +29,10 @@ import picocli.CommandLine.Parameters;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ *
+ * @param <T>
+ */
 public abstract class AbstractSubcommandContainer<T> extends AbstractCmd {
     private static final long DEFAULT_DELAY = 1000;
 

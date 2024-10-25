@@ -15,9 +15,15 @@
  */
 package nl.knaw.dans.dvcli.command.dataset;
 
+import lombok.Value;
+import nl.knaw.dans.dvcli.action.Pair;
+import nl.knaw.dans.dvcli.action.ThrowingFunction;
 import nl.knaw.dans.dvcli.command.AbstractCmd;
+import nl.knaw.dans.dvcli.inputparsers.FieldValuesParamsFileParser;
 import nl.knaw.dans.dvcli.inputparsers.FieldValuesParser;
+import nl.knaw.dans.lib.dataverse.DatasetApi;
 import nl.knaw.dans.lib.dataverse.model.dataset.FieldList;
+import nl.knaw.dans.lib.dataverse.model.dataset.MetadataField;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -25,7 +31,10 @@ import picocli.CommandLine.ParentCommand;
 
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Command(name = "delete-metadata",
          mixinStandardHelpOptions = true,
@@ -54,12 +63,52 @@ public class DatasetDeleteMetadata extends AbstractCmd {
     @ArgGroup(multiplicity = "1")
     private FieldValueOrParameterFile fieldValueOrParameterFile;
 
+    private static class DeleteMetadataAction implements ThrowingFunction<DeleteMetadataParams, String, Exception> {
+        @Override
+        public String apply(DeleteMetadataParams deleteMetadataParams) throws Exception {
+            var fieldList = new FieldList(deleteMetadataParams.fieldValues.stream().toList());
+            deleteMetadataParams.api.deleteMetadata(fieldList, Collections.emptyMap());
+            return "Delete metadata";
+        }
+    }
+
+    @Value
+    private static class DeleteMetadataParams {
+        DatasetApi api;
+        Set<MetadataField> fieldValues;
+    }
+
     @Override
     public void doCall() throws Exception {
-        var metadataFields = new FieldValuesParser(fieldValueOrParameterFile.fieldValues).parse();
-        datasetCmd.batchProcessor(d -> {
-            d.deleteMetadata(new FieldList(metadataFields), Collections.emptyMap());
-            return "Delete metadata";
-        }).process();
+        datasetCmd.<DeleteMetadataParams> paramsBatchProcessorBuilder()
+            .labeledItems(getLabeledItems())
+            .action(new DeleteMetadataAction())
+            .build()
+            .process();
+    }
+
+    private Stream<Pair<String, DeleteMetadataParams>> getLabeledItems() {
+        try {
+            if (fieldValueOrParameterFile.fieldValues != null) {
+                var keyValues = new HashMap<String, String>();
+                for (var fieldValue : fieldValueOrParameterFile.fieldValues) {
+                    var split = fieldValue.split("=", 2);
+                    keyValues.put(split[0], split[1]);
+                }
+                return datasetCmd.getItems().stream()
+                    .map(p -> new Pair<>(p.getFirst(), new FieldValuesParser(keyValues).parse()))
+                    .map(p -> new Pair<>(p.getFirst(), new DeleteMetadataParams(datasetCmd.getDataverseClient().dataset(p.getFirst()), p.getSecond())));
+
+            }
+            else if (fieldValueOrParameterFile.parametersFile != null) {
+                return new FieldValuesParamsFileParser(fieldValueOrParameterFile.parametersFile)
+                    .parse()
+                    .map(p -> new Pair<>(p.getFirst(), new DeleteMetadataParams(datasetCmd.getDataverseClient().dataset(p.getFirst()), p.getSecond())));
+            }
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error parsing field values or parameter file.", e);
+        }
+        throw new IllegalArgumentException("No field values or parameter file specified.");
     }
 }

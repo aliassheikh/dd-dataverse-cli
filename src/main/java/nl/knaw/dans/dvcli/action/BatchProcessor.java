@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class BatchProcessor<I, R>  {
     /**
-     * The labeled items to process.
+     * The labeled items to process. The String is the label, <code>I</code> is the item.
      */
     @NonNull
     private final Stream<Pair<String, I>> labeledItems;
@@ -67,6 +67,11 @@ public class BatchProcessor<I, R>  {
         public BatchProcessorBuilder<I, R> labeledItems(Collection<Pair<String, I>> items) {
             this.labeledItems = items.stream();
             this.numberOfItems = (long) items.size();
+            return this;
+        }
+
+        public BatchProcessorBuilder<I, R> labeledItems(Stream<Pair<String, I>> items) {
+            this.labeledItems = items;
             return this;
         }
     }
