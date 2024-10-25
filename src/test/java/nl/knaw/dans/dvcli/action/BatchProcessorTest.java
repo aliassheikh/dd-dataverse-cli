@@ -59,23 +59,23 @@ public class BatchProcessorTest extends AbstractCapturingTest {
                            a: OK. b: FAILED: Exception type = RuntimeException, message = test
                            c: OK.""" + " "); // java text block trims trailing spaces
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 3
+            INFO  Starting batch processing of 3 items
+            INFO  Processing item 1 of 3: a
             ok
             DEBUG Sleeping for 1 ms
-            INFO  Processing item 2 of 3
+            INFO  Processing item 2 of 3: b
             DEBUG Sleeping for 1 ms
-            INFO  Processing item 3 of 3
+            INFO  Processing item 3 of 3: c
             ok
             INFO  Finished batch processing of 3 items
             """);
         assertThat(messagesOf(logged))
-            .containsExactly("INFO  Starting batch processing",
-                "INFO  Processing item 1 of 3",
+            .containsExactly("INFO  Starting batch processing of 3 items",
+                "INFO  Processing item 1 of 3: a",
                 "DEBUG  Sleeping for 1 ms",
-                "INFO  Processing item 2 of 3",
+                "INFO  Processing item 2 of 3: b",
                 "DEBUG  Sleeping for 1 ms",
-                "INFO  Processing item 3 of 3",
+                "INFO  Processing item 3 of 3: c",
                 "INFO  Finished batch processing of 3 items");
     }
 
@@ -95,14 +95,14 @@ public class BatchProcessorTest extends AbstractCapturingTest {
         assertThat(stderr.toString())
             .isEqualTo("a: OK. b: OK. c: OK. ");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 3
+            INFO  Starting batch processing of 3 items
+            INFO  Processing item 1 of 3: a
             ok
             DEBUG Sleeping for 1000 ms
-            INFO  Processing item 2 of 3
+            INFO  Processing item 2 of 3: b
             ok
             DEBUG Sleeping for 1000 ms
-            INFO  Processing item 3 of 3
+            INFO  Processing item 3 of 3: c
             ok
             INFO  Finished batch processing of 3 items
             """);
@@ -124,12 +124,12 @@ public class BatchProcessorTest extends AbstractCapturingTest {
 
         assertThat(stderr.toString()).isEqualTo("A: OK. B: OK. C: OK. ");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 3
+            INFO  Starting batch processing of 3 items
+            INFO  Processing item 1 of 3: A
             ok
-            INFO  Processing item 2 of 3
+            INFO  Processing item 2 of 3: B
             ok
-            INFO  Processing item 3 of 3
+            INFO  Processing item 3 of 3: C
             ok
             INFO  Finished batch processing of 3 items
             """);
@@ -150,12 +150,12 @@ public class BatchProcessorTest extends AbstractCapturingTest {
 
         assertThat(stderr.toString()).isEqualTo("X: OK. Y: OK. Z: OK. ");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 3
+            INFO  Starting batch processing of 3 items
+            INFO  Processing item 1 of 3: X
             ok
-            INFO  Processing item 2 of 3
+            INFO  Processing item 2 of 3: Y
             ok
-            INFO  Processing item 3 of 3
+            INFO  Processing item 3 of 3: Z
             ok
             INFO  Finished batch processing of 3 items
             """);
@@ -172,11 +172,11 @@ public class BatchProcessorTest extends AbstractCapturingTest {
 
         assertThat(stderr.toString()).isEqualTo("");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
+            INFO  Starting batch processing of 0 items
             INFO  Finished batch processing of 0 items
             """);
         assertThat(messagesOf(logged)).containsExactly(
-            "INFO  Starting batch processing",
+            "INFO  Starting batch processing of 0 items",
             "INFO  Finished batch processing of 0 items");
     }
 

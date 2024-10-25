@@ -91,16 +91,16 @@ public class TruncateNotificationsTest extends AbstractCapturingTest {
         
         assertThat(stderr.toString()).isEqualTo("1: OK. 2: OK. 3: OK. ");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 3
+            INFO  Starting batch processing of 3 items
+            INFO  Processing item 1 of 3: 1
             INFO  Deleting notifications for user with id 1
             Deleted 3 record(s) for user with id 1
             DEBUG Sleeping for 10 ms
-            INFO  Processing item 2 of 3
+            INFO  Processing item 2 of 3: 2
             INFO  Deleting notifications for user with id 2
             Deleted 2 record(s) for user with id 2
             DEBUG Sleeping for 10 ms
-            INFO  Processing item 3 of 3
+            INFO  Processing item 3 of 3: 3
             INFO  Deleting notifications for user with id 3
             Deleted 1 record(s) for user with id 3
             INFO  Finished batch processing of 3 items

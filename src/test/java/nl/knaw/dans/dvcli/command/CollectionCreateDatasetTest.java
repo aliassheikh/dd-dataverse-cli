@@ -64,12 +64,12 @@ public class CollectionCreateDatasetTest extends AbstractCapturingTest {
         cmd.doCall();
 
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 3
+            INFO  Starting batch processing of 3 items
+            INFO  Processing item 1 of 3: A
             DEBUG buildUri: https://does.not.exist.dans.knaw.nl/api/dataverses/A/datasets
-            INFO  Processing item 2 of 3
+            INFO  Processing item 2 of 3: B
             DEBUG buildUri: https://does.not.exist.dans.knaw.nl/api/dataverses/B/datasets
-            INFO  Processing item 3 of 3
+            INFO  Processing item 3 of 3: C
             DEBUG buildUri: https://does.not.exist.dans.knaw.nl/api/dataverses/C/datasets
             INFO  Finished batch processing of 3 items
             """);
@@ -103,8 +103,8 @@ public class CollectionCreateDatasetTest extends AbstractCapturingTest {
 
         assertThat(stderr.toString()).isEqualTo("A: OK. ");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 1
+            INFO  Starting batch processing of 1 items
+            INFO  Processing item 1 of 1: A
             mock response
             INFO  Finished batch processing of 1 items
             """);
@@ -138,9 +138,9 @@ public class CollectionCreateDatasetTest extends AbstractCapturingTest {
             B: FAILED: Exception type = IOException, message = Is a directory
             """);
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 2
-            INFO  Processing item 2 of 2
+            INFO  Starting batch processing of 2 items
+            INFO  Processing item 1 of 2: A
+            INFO  Processing item 2 of 2: B
             INFO  Finished batch processing of 2 items
             """);
     }

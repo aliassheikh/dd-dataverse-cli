@@ -15,10 +15,10 @@
  */
 package nl.knaw.dans.dvcli.command.dataset;
 
+import nl.knaw.dans.dvcli.action.BatchProcessor;
 import nl.knaw.dans.dvcli.action.ConsoleReport;
 import nl.knaw.dans.dvcli.action.Pair;
 import nl.knaw.dans.dvcli.action.SingleIdOrIdsFile;
-import nl.knaw.dans.dvcli.action.ThrowingFunction;
 import nl.knaw.dans.dvcli.command.AbstractCmd;
 import nl.knaw.dans.lib.dataverse.AdminApi;
 import nl.knaw.dans.lib.dataverse.DataverseException;
@@ -30,35 +30,31 @@ import java.util.List;
 
 @Command(name = "validate-files",
          mixinStandardHelpOptions = true,
-         description = "Make sure that all files are correctly stored in object storage.")
+         description = "Validate the fixity checksums of the files in a dataset.")
 public class DatasetValidateFiles extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
 
-    protected List<Pair<String, IdParam>> getIds() throws IOException {
+    protected List<Pair<String, String>> getIds() throws IOException {
         List<String> pids = new SingleIdOrIdsFile(datasetCmd.getTargets(), SingleIdOrIdsFile.DEFAULT_TARGET_PLACEHOLDER).getPids().toList();
-        return pids.stream().map(p -> new Pair<>(p, new IdParam(datasetCmd.getDataverseClient().admin(), p))).toList();
+        // The label is the same as the id. Since the BatchProcessor expects labeled items, we create a list of pairs with the same id as label.
+        return pids.stream().map(p -> new Pair<>(p, p)).toList();
     }
 
     protected record IdParam(AdminApi admin, String id) {
     }
 
-    private static class ValidateFilesAction implements ThrowingFunction<IdParam, String, Exception> {
-        @Override
-        public String apply(IdParam idParam) throws IOException, DataverseException {
-            var r = idParam.admin().validateDatasetFiles(idParam.id);
-            return r.getBodyAsString();
-        }
-    }
-
     @Override
     public void doCall() throws IOException, DataverseException {
-        datasetCmd.<IdParam> paramsBatchProcessorBuilder()
+        // Not using the helper method on datasetCmd because we need to call the admin endpoint and not the dataset endpoint.
+        BatchProcessor.<String, String> builder()
             .labeledItems(getIds())
-            .action(new ValidateFilesAction())
+            .action(pid -> {
+                var r = datasetCmd.getDataverseClient().admin().validateDatasetFiles(pid);
+                return r.getBodyAsString();
+            })
             .report(new ConsoleReport<>())
             .build()
             .process();
     }
-
 }

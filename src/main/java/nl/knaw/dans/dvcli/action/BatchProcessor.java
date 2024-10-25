@@ -19,7 +19,9 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 /**
  * Processes a batch of labeled items by applying an action to each item. The labels are used for reporting. Typically, the label is the ID of the item. After each action, the processor waits for a
@@ -31,12 +33,17 @@ import java.util.List;
  */
 @Builder
 @Slf4j
-public class BatchProcessor<I, R> {
+public class BatchProcessor<I, R>  {
     /**
      * The labeled items to process.
      */
     @NonNull
-    private final List<Pair<String, I>> labeledItems;
+    private final Stream<Pair<String, I>> labeledItems;
+
+    /**
+     * The number of items to process. If the labeled items are a collection, this number is the size of the collection. Otherwise, it is null.
+     */
+    private final Long numberOfItems;
 
     /**
      * The action to apply to each item.
@@ -56,15 +63,28 @@ public class BatchProcessor<I, R> {
     @Builder.Default
     private final long delay = 1000;
 
-    public void process() {
-        log.info("Starting batch processing");
-        int i = 0;
-        for (var labeledItem : labeledItems) {
-            delayIfNeeded(i);
-            log.info("Processing item {} of {}", ++i, labeledItems.size());
-            callAction(labeledItem.getFirst(), labeledItem.getSecond());
+    public static class BatchProcessorBuilder<I, R> {
+        public BatchProcessorBuilder<I, R> labeledItems(Collection<Pair<String, I>> items) {
+            this.labeledItems = items.stream();
+            this.numberOfItems = (long) items.size();
+            return this;
         }
-        log.info("Finished batch processing of {} items", labeledItems.size());
+    }
+
+    public void process() {
+        log.info("Starting batch processing of " + (numberOfItems == null ? "?" : numberOfItems + " items"));
+        AtomicInteger i = new AtomicInteger(0);
+        try {
+            labeledItems.forEach(labeledItem -> {
+                int index = i.incrementAndGet();
+                delayIfNeeded(index);
+                log.info("Processing item {} of {}: {}", index, numberOfItems == null ? "?" : numberOfItems, labeledItem.getFirst());
+                callAction(labeledItem.getFirst(), labeledItem.getSecond());
+            });
+        } finally {
+            labeledItems.close();
+        }
+        log.info("Finished batch processing of " + (numberOfItems == null ? "?" : numberOfItems + " items"));
     }
 
     private void callAction(String label, I item) {
@@ -78,7 +98,7 @@ public class BatchProcessor<I, R> {
     }
 
     private void delayIfNeeded(int i) {
-        if (delay > 0 && i > 0) {
+        if (delay > 0 && i > 1) {
             log.debug("Sleeping for {} ms", delay);
             try {
                 Thread.sleep(delay);

@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.dvcli.command;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.dvcli.AbstractCapturingTest;
 import nl.knaw.dans.dvcli.action.Pair;
 import nl.knaw.dans.dvcli.command.collection.CollectionCmd;
@@ -32,8 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@Slf4j
 public class AbstractSubcommandContainerTest extends AbstractCapturingTest {
-    private static final Logger log = LoggerFactory.getLogger(AbstractSubcommandContainerTest.class);
 
     private static class TestCmd extends AbstractSubcommandContainer<Object> {
 
@@ -265,14 +266,14 @@ public class AbstractSubcommandContainerTest extends AbstractCapturingTest {
 
         assertThat(stderr.toString()).isEqualTo("1: OK. ");
         assertThat(stdout.toString()).isEqualTo("""
-            INFO  Starting batch processing
-            INFO  Processing item 1 of 1
+            INFO  Starting batch processing of 1 items
+            INFO  Processing item 1 of 1: 1
             value of 1
             INFO  Finished batch processing of 1 items
             """);
         assertThat(logged.list.stream().map(Object::toString).toList()).containsExactly(
-            "[INFO] Starting batch processing",
-            "[INFO] Processing item 1 of 1",
+            "[INFO] Starting batch processing of 1 items",
+            "[INFO] Processing item 1 of 1: 1",
             "[INFO] Finished batch processing of 1 items"
         );
     }
