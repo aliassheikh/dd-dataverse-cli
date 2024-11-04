@@ -32,44 +32,29 @@ public class DatasetPublish extends AbstractCmd {
     @ParentCommand
     private DatasetCmd datasetCmd;
 
-    static class PublishParams {
-        @ArgGroup(exclusive = true)
-        VersionUpdateType versionUpdateType;
+    @ArgGroup(exclusive = true)
+    VersionUpdateType versionUpdateType;
 
-        static class VersionUpdateType {
-            @Option(names = "--major", description = "Version update type: major (default)")
-            boolean major;
-            @Option(names = "--minor", description = "Version update type: minor")
-            boolean minor;
-        }
-
-        @Option(names = { "-a", "--assure-indexed" }, paramLabel = "assure-indexed", description = "Set to true to ensure that indexing has already happened before publish.")
-        private boolean assureIsIndexed = true;
+    static class VersionUpdateType {
+        @Option(names = "--major", description = "Version update type: major")
+        boolean major;
+        @Option(names = "--minor", description = "Version update type: minor (default)")
+        boolean minor;
     }
 
-    @ArgGroup(exclusive = false)
-    PublishParams publishParams;
+    @Option(names = {"--skip-assure-indexed" }, paramLabel = "skip-assure-indexed", description = "Do not attempt to assure that the dataset is indexed.")
+    private boolean skipAssureIsIndexed;
 
     private UpdateType getUpdateType() {
-        if (publishParams != null && publishParams.versionUpdateType != null) {
-            if (publishParams.versionUpdateType.minor) {
-                return UpdateType.minor;
-            }
-        }
-        return UpdateType.major;
-    }
-
-    private boolean isAssureIndexed() {
-        if (publishParams != null)
-            return publishParams.assureIsIndexed;
-
-        return true;
+        if (versionUpdateType != null && versionUpdateType.major)
+            return UpdateType.major;
+        return UpdateType.minor;
     }
 
     @Override
     public void doCall() throws IOException, DataverseException {
         datasetCmd.batchProcessor(dataset -> dataset
-            .publish(this.getUpdateType(), this.isAssureIndexed())
+            .publish(this.getUpdateType(), skipAssureIsIndexed)
             .getEnvelopeAsString()
         ).process();
     }
