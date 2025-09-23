@@ -22,7 +22,7 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>1.9.0</version>
+        <version>1.9.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>dd-dataverse-cli</artifactId>
@@ -35,7 +35,6 @@
 
     <properties>
         <main-class>nl.knaw.dans.dvcli.DdDataverseCli</main-class>
-        <picocli.version>4.7.5</picocli.version> <!-- TODO: move to parent -->
         <command-name>dataverse</command-name>
     </properties>
 
@@ -80,7 +79,6 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-dataverse-client-lib</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
